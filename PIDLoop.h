@@ -1,30 +1,31 @@
-#define PI 3.14159265
-#include <math.h>
 #include "WPILib.h"
 #include "Constants.h"
-#include "PIDMoveSource.h"
-#include "PIDMoveOutput.h"
+#include <math.h>
+#include <fstream>
 
 #ifndef SRC_PIDLOOP_H
 #define SRC_PIDLOOP_H
 
 class PIDLoop {
 
-	AHRS gyro;
-	Aimer aimer;
-	Joystick joystick;
-	RobotDrive driveTrain;
-	PIDMoveSource angleSource;; //angle pid loop source variable
-	PIDMoveSource xSource; //xOffset pid loop source variable
-	PIDMoveOutput angleOutput; //angle pid loop output variable
-	PIDMoveOutput xOutput; //angle pid loop source variable
-	PIDController pidAngle; //angle pid loop
-	PIDController pidX; //xOffset pid loop
-	Timer timer;
+  float k_p_Angle;
+  float k_i_Angle;
+  float k_d_Angle;
+  float p_Angle;
+  float i_Angle;
+  float d_Angle;
+  float angle_error;
+  float last_angle_error;
+  float angleOutput;
+  float angleMaxError;
+  float iteration_time;
 
 public:
-	PIDLoop(RobotDrive *driveTrain_, AHRS *gyro_, Joystick *joystick_);
-	int runPID();
+	PIDLoop();
+	void resetPID();
+	void setAngle(float pAngleInput, float iAngleInput, float dAngleInput);
+	float PIDAngle(float yaw, float desiredAngle);
+	float PIDX(float distance, float angleOffset, float cameraOffset);
 };
 
-#endif
+#endif /* SRC_ROBOT_H_ */

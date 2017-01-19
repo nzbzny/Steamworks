@@ -1,6 +1,8 @@
 #include "WPILib.h"
 #include "Constants.h"
 #include "PIDLoop.h"
+#include "Aimer.h"
+#include "AHRS.h"
 #include <math.h>
 #include <thread>
 #include <fstream>
@@ -10,11 +12,16 @@
 
 class Robot : public SampleRobot {
 
-	RobotDrive robotDrive;
-	Joystick driveStick;
-	Joystick operatorStick;
-  AHRS gyro;
+	frc::RobotDrive robotDrive;
+	frc::Joystick driveStick;
+	frc::Joystick operatorStick;
+	AHRS gyro;
 	PIDLoop pid;
+	Aimer aimer;
+	Ultrasonic leftProx;
+	Ultrasonic rightProx;
+	DigitalInput leftIR;
+	DigitalInput rightIR;
 
 public:
 	Robot();

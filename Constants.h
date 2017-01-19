@@ -4,10 +4,10 @@
 namespace Constants {
 
   //Pin Definitions
-  static constexpr int frontLeftDriveChannel = 99;
-  static constexpr int frontrearLeftDriveChannel = 99;
-  static constexpr int frontRightDriveChannel = 99;
-  static constexpr int rearRightDriveChannel = 99;
+  static constexpr int frontLeftDriveChannel = 2;
+  static constexpr int rearLeftDriveChannel = 3;
+  static constexpr int frontRightDriveChannel = 1;
+  static constexpr int rearRightDriveChannel = 0;
   static constexpr int driveStickChannel = 0;
   static constexpr int operatorStickChannel = 1;
 
@@ -18,7 +18,7 @@ namespace Constants {
   static constexpr float xOffsetP = .01;
   static constexpr float xOffsetI = .01;
   static constexpr float xOffsetD = .01;
-  static constexpr float angleMaxError = 3;
+  static constexpr float angleMaxError = 1;
   static constexpr float xMaxError = 3;
   static constexpr float gearPIDIterationTime = .006; //max update rate of the gyro is .005 - TODO: will need to change based on how fast the camera updates
   static constexpr float angleOutputMin = -.5;
