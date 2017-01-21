@@ -7,6 +7,8 @@
 #include <thread>
 #include <fstream>
 
+#define PI 3.14159265
+
 #ifndef SRC_ROBOT_H_
 #define SRC_ROBOT_H_
 

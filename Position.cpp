@@ -1,9 +1,12 @@
 /*
+
  * Position.cpp
  *
  *  Created on: Jan 14, 2017
  *      Author: Owner
  */
+
+/*
 #include "Position.h"
 
 
@@ -82,7 +85,8 @@ Compiled Position::getAll() const
 	all.timeSinceLastFix = time(temp) - fixed;
 	return all;
 
-}
+}*/
+
 
 
 
