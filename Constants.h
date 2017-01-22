@@ -14,6 +14,7 @@ namespace Constants {
   static constexpr int gearReleaseOutSole = 99;
   static constexpr int rotatorChannel = 99;
   static constexpr int shooterChannel = 99;
+  static constexpr int compressorPin = 99;
 
   //PID
   static constexpr float angle_p_default = .025;

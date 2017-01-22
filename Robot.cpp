@@ -25,7 +25,8 @@ Robot::Robot() :
 		leftIR(4),
 		rightIR(5),
 		gear(Constants::gearReleaseInSole, Constants::gearReleaseOutSole),
-		shooter(Constants::rotatorChannel, Constants::shooterChannel)
+		shooter(Constants::rotatorChannel, Constants::shooterChannel),
+		compressor(Constants::compressorPin)
 
 {
 	robotDrive.SetExpiration(0.1);
@@ -67,6 +68,7 @@ void Robot::OperatorControl()
 	leftProx.SetAutomaticMode(true);
 	rightProx.SetAutomaticMode(true);
 	shooter.enable();
+	compressor.Start();
 
 	while (IsOperatorControl() && IsEnabled())
 	{
@@ -174,6 +176,7 @@ void Robot::OperatorControl()
 	//gearMoveThread.join();
 	robotDrive.SetSafetyEnabled(true);
 	shooter.disable();
+	compressor.Stop();
 }
 
 void Robot::Autonomous() {

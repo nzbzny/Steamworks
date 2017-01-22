@@ -33,6 +33,7 @@ class Robot : public SampleRobot {
 	DigitalInput rightIR;
 	GearSubsystem gear;
 	ShooterSubsystem shooter;
+	Compressor compressor;
 
 public:
 	Robot();
