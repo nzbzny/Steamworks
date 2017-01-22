@@ -1,13 +1,13 @@
 #include "GearSubsystem.h"
 
 GearSubsystem::GearSubsystem(uint32_t bottomInSole, uint32_t bottomOutSole) :
-	bottom(bottomInSole, bottomOutSole)
+	bottomPneumatic(bottomInSole, bottomOutSole)
 {}
 
-void GearSubsystem::release(bool state) {
-	bottom.set(state);
+void GearSubsystem::setBottom(bool state) { //open / close the release mechanism
+	bottomPneumatic.set(state);
 }
 
-bool GearSubsystem::getBottom() {
-	return bottom.get();
+bool GearSubsystem::getBottom() { //return state of the bottom
+	return bottomPneumatic.get();
 }

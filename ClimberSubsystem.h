@@ -5,7 +5,6 @@
 
 class ClimberSubsystem {
 
-	Pneumatics bottom;
 
 public:
 	ClimberSubsystem();

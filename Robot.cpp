@@ -10,6 +10,10 @@
 }*/
 
 Robot::Robot() :
+		/*frontLeftMotor(Constants::frontLeftDriveChannel),
+		rearLeftMotor(Constants::rearLeftDriveChannel),
+		frontRightMotor(Constants::frontRightDriveChannel),
+		rearRightMotor(Constants::rearRightDriveChannel),*/
 		robotDrive(Constants::frontLeftDriveChannel, Constants::rearLeftDriveChannel, Constants::frontRightDriveChannel, Constants::rearRightDriveChannel),
 		driveStick(Constants::driveStickChannel),
 		operatorStick(Constants::operatorStickChannel),
@@ -19,7 +23,10 @@ Robot::Robot() :
 		leftProx(1, 0),
 		rightProx(3, 2),
 		leftIR(4),
-		rightIR(5)
+		rightIR(5),
+		gear(Constants::gearReleaseInSole, Constants::gearReleaseOutSole),
+		shooter(Constants::rotatorChannel, Constants::shooterChannel)
+
 {
 	robotDrive.SetExpiration(0.1);
 	robotDrive.SetInvertedMotor(RobotDrive::kFrontLeftMotor, false);
@@ -41,9 +48,9 @@ void Robot::OperatorControl()
 	robotDrive.SetSafetyEnabled(false);
 	//bool gearMoveThreadRunBool = false;
 	//std::thread gearMoveThread(moveToGearThreadFunction, &gearMoveThreadRunBool, &pid); //thread not needed yet - might need to be implemented later
-	pid.setAngle(SmartDashboard::GetNumber("angle_p", .015), SmartDashboard::GetNumber("angle_i", .001), SmartDashboard::GetNumber("angle_d", .001));
-	pid.setY(SmartDashboard::GetNumber("y_p", .025), SmartDashboard::GetNumber("y_i", .001), SmartDashboard::GetNumber("y_d", .001));
-	pid.setX(SmartDashboard::GetNumber("x_p", .025), SmartDashboard::GetNumber("x_i", .001), SmartDashboard::GetNumber("x_d", .001));
+	pid.setAngle(SmartDashboard::GetNumber("angle_p", Constants::angle_p_default), SmartDashboard::GetNumber("angle_i", Constants::angle_i_default), SmartDashboard::GetNumber("angle_d", Constants::angle_d_default));
+	pid.setY(SmartDashboard::GetNumber("y_p", Constants::y_p_default), SmartDashboard::GetNumber("y_i", Constants::y_i_default), SmartDashboard::GetNumber("y_d", Constants::y_d_default));
+	pid.setX(SmartDashboard::GetNumber("x_p", Constants::x_p_default), SmartDashboard::GetNumber("x_i", Constants::x_i_default), SmartDashboard::GetNumber("x_d", Constants::x_d_default));
 	gyro.ZeroYaw();
 	float driveX;
 	float driveY;
@@ -53,53 +60,89 @@ void Robot::OperatorControl()
 	float gearAngle = 0;
 	float yOutput;
 	float xOutput;
+	bool gyroValid;
+	bool resetButtonPush;
+	bool calibrating;
 
 	leftProx.SetAutomaticMode(true);
 	rightProx.SetAutomaticMode(true);
+	shooter.enable();
 
 	while (IsOperatorControl() && IsEnabled())
 	{
-		SmartDashboard::PutNumber("x_p", 0);
-		SmartDashboard::PutNumber("x_i", 0);
-		SmartDashboard::PutNumber("x_d", 0);
 		angleOutput = 0; //reset output so that if the pid loop isn't being called it's not reserved from the last time it's called
 		angle = gyro.GetYaw() < 0 ? 360 + gyro.GetYaw() : gyro.GetYaw();
 		yOutput = 0; //reset output
 		xOutput = 0;
 
 
-		bool gyroValid = gyro.IsConnected();
-		bool resetButtonPush = driveStick.GetRawButton(11);
+		gyroValid = gyro.IsConnected();
+		resetButtonPush = driveStick.GetRawButton(11);
 		if (resetButtonPush)
 		{
 			gyro.ResetDisplacement();
 			SmartDashboard::PutString("Status Update", "Gyro Displacement Reset");
 		}
-		bool calibrating = gyro.IsCalibrating();
+		calibrating = gyro.IsCalibrating();
 
+		if(driveStick.GetRawButton(Constants::gearReleaseButton)) { //TODO: may need to swap values
+			gear.setBottom(true);
+		} else {
+			gear.setBottom(false);
+		}
 
 		if(driveStick.GetPOV() != -1 && gyroValid) { //turn to angle 0, 90, 180, 270
 			angleOutput = pid.PIDAngle(angle, driveStick.GetPOV()); //call pid loop
 		} else {
-			pid.resetPIDAngle();
+			pid.resetPIDAngle(); //if loop is done reset values
 		}
 
-		if(driveStick.GetRawButton(1)) {
+		if(driveStick.GetRawButton(Constants::turnToGearButton)) { //turn to gear
 			angleOutput = pid.PIDAngle(angle, gearAngle);
 		} else {
-			gearAngle = aimer.GetAngleToGear() + angle;
-			gearAngle = gearAngle < 360 ? gearAngle : gearAngle - 360;
+			gearAngle = aimer.GetAngleToGear() + angle; //reset absolute angle gear is at
+			gearAngle = gearAngle < 360 ? gearAngle : gearAngle - 360; //scaling
 			gearAngle = gearAngle > 0 ? gearAngle : gearAngle + 360;
+			pid.resetPIDAngle(); //if loop is done reset values
 		}
 
-		if(driveStick.GetRawButton(2)) {
+		if(driveStick.GetRawButton(Constants::moveToGearButton)) { //pid move
 			yOutput = pid.PIDY(leftProx.GetRangeInches(), rightProx.GetRangeInches());
 			xOutput = pid.PIDX(aimer.GetAngleToGear());
+		} else { //if loop is done reset values
+			pid.resetPIDX();
+			pid.resetPIDY();
 		}
-		driveX = fabs(driveStick.GetX()) < .05 ? 0.0 : driveStick.GetX(); //deadzones - need to figure out deadzones better (RecycleRush code might have them)
-		driveY = fabs(driveStick.GetY()) < .05 ? 0.0 : driveStick.GetY(); //TODO: make getrawaxis w/ numbers instead of getx, gety, getz
-		driveZ = fabs(driveStick.GetZ()) < .5 ? 0.0 : driveStick.GetZ() * .33; //Z axis deadzone is huge
-		robotDrive.MecanumDrive_Cartesian(driveX + xOutput, driveY + yOutput, driveZ + angleOutput);
+
+		//scaling for the joystick deadzones
+		driveX = driveStick.GetRawAxis(Constants::driveXAxis);
+		driveY = driveStick.GetRawAxis(Constants::driveYAxis);
+		driveZ = driveStick.GetRawAxis(Constants::driveZAxis);
+
+		driveX = scaleJoysticks(driveX, Constants::driveXDeadZone, Constants::driveXMax * (.5 - (driveStick.GetRawAxis(Constants::driveThrottleAxis) / 2)), Constants::driveXDegree);
+		driveY = scaleJoysticks(driveY, Constants::driveYDeadZone, Constants::driveYMax * (.5 - (driveStick.GetRawAxis(Constants::driveThrottleAxis) / 2)), Constants::driveYDegree);
+		driveZ = scaleJoysticks(driveZ, Constants::driveZDeadZone, Constants::driveZMax * (.5 - (driveStick.GetRawAxis(Constants::driveThrottleAxis) / 2)), Constants::driveZDegree);
+
+	if (driveStick.GetRawButton(Constants::driveOneAxisButton)) { //drive only one axis
+		if (fabs(driveX) > fabs(driveY) && fabs(driveX) > fabs(driveZ)) { //if X is greater than Y and Z, then it will only go in the direction of X
+			driveY = 0;
+			driveZ = 0;
+		}
+		else if (fabs(driveY) > fabs(driveX) && fabs(driveY) > fabs(driveZ)) { //if Y is greater than X and Z, then it will only go in the direction of Y
+			driveX = 0;
+			driveZ = 0;
+		}
+		else { //if Z is greater than X and Y, then it will only go in the direction of Z
+			driveX = 0;
+			driveY = 0;
+		}
+	}
+
+	driveX = fabs(driveX + xOutput) > 1 ? std::copysign(1, driveX + xOutput) : driveX + xOutput;
+	driveY = fabs(driveY + yOutput) > 1 ? std::copysign(1, driveY + yOutput) : driveY + yOutput;
+	driveZ = fabs(driveZ + angleOutput) > 1 ? std::copysign(1, driveZ + angleOutput) : driveZ + angleOutput;
+
+	robotDrive.MecanumDrive_Cartesian(driveX + xOutput, driveY + yOutput, driveZ + angleOutput);
 /*		if (operatorStick.GetRawButton(Constants::runGearMoveThreadButton)) {
 			gearMoveThreadRunBool = true;
 		} //should be able to reopen the thread after it's closed by the cancel button*/ //thread code - not needed right now
@@ -124,12 +167,13 @@ void Robot::OperatorControl()
 		SmartDashboard::PutNumber("yOutput", yOutput);
 		SmartDashboard::PutNumber("xOutput", xOutput);
 
-		SmartDashboard::PutBoolean("Button 11 pushed", resetButtonPush);
-		SmartDashboard::PutBoolean("Button 12 pushed", calibrating);
+		SmartDashboard::PutBoolean("resetButtonPushed", resetButtonPush);
+		SmartDashboard::PutBoolean("calibrateButtonPushed", calibrating);
 	}
 	//gearMoveThreadRunBool = false;
 	//gearMoveThread.join();
 	robotDrive.SetSafetyEnabled(true);
+	shooter.disable();
 }
 
 void Robot::Autonomous() {
@@ -241,6 +285,24 @@ void Robot::Autonomous() {
 inline float getAverageDistance(const Ultrasonic& leftProx, const Ultrasonic& rightProx)
 {
 	return ((float)leftProx.GetRangeInches() + (float)rightProx.GetRangeInches()) / 2.0;
+}
+
+static float scaleJoysticks(float power, float dead, float max, int degree) {
+	if (degree < 0) {	// make sure degree is positive
+		degree = 1;
+	}
+	if (degree % 2 == 0) {	// make sure degree is odd
+		degree++;
+	}
+	if (fabs(power) < dead) {	// if joystick input is in dead zone, return 0
+		return 0;
+	}
+	else if  (power > 0) {	// if it is outside of the dead zone, then the output is a function of specified degree centered at the end of the dead zone
+		return (max * pow(power - dead, degree) / pow(1 - dead, degree));
+	}
+	else {
+		return (max * pow(power + dead, degree) / pow(1 - dead, degree));
+	}
 }
 
 START_ROBOT_CLASS(Robot)

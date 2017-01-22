@@ -45,6 +45,8 @@ class PIDLoop {
 public:
 	PIDLoop();
 	void resetPIDAngle();
+  void resetPIDX();
+  void resetPIDY();
 	void setAngle(float pAngleInput, float iAngleInput, float dAngleInput);
 	void setX(float pXInput, float iXInput, float dXInput);
 	void setY(float pYInput, float iYInput, float dYInput);
