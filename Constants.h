@@ -15,6 +15,10 @@ namespace Constants {
   static constexpr int rotatorChannel = 99;
   static constexpr int shooterChannel = 99;
   static constexpr int compressorPin = 99;
+  static constexpr int driveXAxis = 0;
+  static constexpr int driveYAxis = 1;
+  static constexpr int driveZAxis = 2;
+  static constexpr int driveThrottleAxis = 3;
 
   //PID
   static constexpr float angle_p_default = .025;
@@ -30,7 +34,7 @@ namespace Constants {
 
   //Joystick Buttons
   static constexpr int runGearMoveThreadButton = 99;
-  static constexpr int cancelGearMoveThreadButton = 99;4
+  static constexpr int cancelGearMoveThreadButton = 99;
   static constexpr int turnToGearButton = 1;
   static constexpr int moveToGearButton = 2;
   static constexpr int driveOneAxisButton = 3;

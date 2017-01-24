@@ -4,7 +4,7 @@ ShooterSubsystem::ShooterSubsystem(int rotatorChannel, int shooterChannel) :
   rotator(rotatorChannel),
   shooter(shooterChannel)
 {
-  rotator.SetTalonControlMode(CANTalon::TalonControlMode::kPercentVbus); //enum might be wrong - check in eclipse
+  rotator.SetTalonControlMode(CANTalon::TalonControlMode::kThrottleMode); //enum might be wrong - check in eclipse
   shooter.SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode); //enum might be wrong - check in eclipse
 }
 
