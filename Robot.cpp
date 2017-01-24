@@ -43,7 +43,7 @@ Robot::Robot() :
 		leftIR(4),
 		rightIR(5),
 		gear(Constants::gearReleaseInSole, Constants::gearReleaseOutSole),
-		shooter(Constants::rotatorChannel, Constants::shooterChannel),
+		shooter(Constants::rotatorChannel, Constants::shooterChannel, Constants::agitatorChannel),
 		compressor(Constants::compressorPin)
 
 {
@@ -79,6 +79,7 @@ void Robot::OperatorControl()
 	float gearAngle = 0;
 	float yOutput;
 	float xOutput;
+	float voltage = 0; //testing data for battery voltage
 	bool gyroValid;
 	bool resetButtonPush;
 	bool calibrating;
@@ -94,6 +95,7 @@ void Robot::OperatorControl()
 		angle = gyro.GetYaw() < 0 ? 360 + gyro.GetYaw() : gyro.GetYaw();
 		yOutput = 0; //reset output
 		xOutput = 0;
+		voltage = DriverStation::GetInstance().GetBatteryVoltage();
 
 
 		gyroValid = gyro.IsConnected();
@@ -189,6 +191,8 @@ void Robot::OperatorControl()
 
 		SmartDashboard::PutBoolean("resetButtonPushed", resetButtonPush);
 		SmartDashboard::PutBoolean("calibrateButtonPushed", calibrating);
+
+		SmartDashboard::PutNumber("voltage", voltage);
 	}
 	//gearMoveThreadRunBool = false;
 	//gearMoveThread.join();

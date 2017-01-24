@@ -92,7 +92,7 @@ float PIDLoop::PIDAngle(float angleOffset, float desiredAngle) {
   angleOutput = fabs(angleOutput) < .23 ? std::copysign(.23, angleOutput) : angleOutput; //if angleOutput is below min, set to min
   angleOutput = fabs(angleOutput) > 1.0 ? std::copysign(1.0, angleOutput) : angleOutput; //if angleOutput is above max, set to max
   //angleOutput = angle_error < 0 ? angleOutput : -angleOutput;
-  if (fabs(angle_error) < Constants::angleMaxError) { //if done moving
+  if (fabs(angle_error) < angleMaxError) { //if done moving
 	  i_Angle = 0;
 	  angleOutput = 0;
   }
@@ -186,9 +186,9 @@ float PIDLoop::PIDY(float lDistance, float rDistance) {
   if (lDistance > 0 && lDistance < 100 && rDistance > 0 && rDistance < 100) { //if both distances are within range to go to a gear
 	  averageDistance = (lDistance + rDistance) / 2;
   }
-  else if (lDistance < 0 || lDistance > 100 && rDistance > 0 && rDistance < 100) { //if left sensor is outside of range to move to gear
+  else if ((lDistance < 0 || lDistance > 100) && (rDistance > 0 && rDistance < 100)) { //if left sensor is outside of range to move to gear
 	  averageDistance = rDistance;
-  } else if (rDistance < 0 || rDistance > 100 && lDistance > 0 && lDistance < 100) { //if right sensor is outside of range to move to gear
+  } else if ((rDistance < 0 || rDistance > 100) && (lDistance > 0 && lDistance < 100)) { //if right sensor is outside of range to move to gear
 	  averageDistance = lDistance;
   } else {
 	  SmartDashboard::PutString("PIDY Status", "Ultrasonic Error");

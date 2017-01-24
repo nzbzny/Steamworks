@@ -14,11 +14,14 @@ namespace Constants {
   static constexpr int gearReleaseOutSole = 99;
   static constexpr int rotatorChannel = 99;
   static constexpr int shooterChannel = 99;
+  static constexpr int agitatorChannel = 99;
   static constexpr int compressorPin = 99;
   static constexpr int driveXAxis = 0;
   static constexpr int driveYAxis = 1;
   static constexpr int driveZAxis = 2;
   static constexpr int driveThrottleAxis = 3;
+  static constexpr int intakeMotorPin = 99;
+  static constexpr int verticalConveyorMotorPin = 99;
 
   //PID
   static constexpr float angle_p_default = .025;
@@ -41,15 +44,18 @@ namespace Constants {
   static constexpr int gearReleaseButton = 99;
 
   //Joystick scaling constants
-  const static constexpr float driveXDeadZone = .2;
-  const static constexpr float driveXMax = 1;
-  const static constexpr int driveXDegree = 1;
-  const static constexpr float driveYDeadZone = .2;
-  const static constexpr float driveYMax = 1;
-  const static constexpr int driveYDegree = 1;
-  const static constexpr float driveZDeadZone = .2;
-  const static constexpr float driveZMax = .375;
-  const static constexpr int driveZDegree = 1;
+  static constexpr float driveXDeadZone = .2;
+  static constexpr float driveXMax = 1;
+  static constexpr int driveXDegree = 1;
+  static constexpr float driveYDeadZone = .2;
+  static constexpr float driveYMax = 1;
+  static constexpr int driveYDegree = 1;
+  static constexpr float driveZDeadZone = .2;
+  static constexpr float driveZMax = .375;
+  static constexpr int driveZDegree = 1;
+
+  //Shooter
+  static constexpr int shooterMaxSpeed = 512; //TODO: temp
 
 };
 #endif
