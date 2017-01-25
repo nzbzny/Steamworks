@@ -86,7 +86,6 @@ float PIDLoop::PIDAngle(float angleOffset, float desiredAngle) {
   angleOutput = p_Angle + i_Angle + d_Angle; //calculate output
   last_angle_error = angle_error; //set last angle error for d value
 
-  //angleOutput = (angle_error / 180) * .7 + .2;
 
 
   angleOutput = fabs(angleOutput) < .23 ? std::copysign(.23, angleOutput) : angleOutput; //if angleOutput is below min, set to min
@@ -98,7 +97,7 @@ float PIDLoop::PIDAngle(float angleOffset, float desiredAngle) {
   }
   angleOutput = -angleOutput;
   logger << p_Angle << " " << angle_error << " " << angleOutput << "\n"; //output to log file
-  frc::Wait(iteration_time);
+  //frc::Wait(iteration_time);
   logger.close();
 
   SmartDashboard::PutNumber("Accumulated i", i_Angle);

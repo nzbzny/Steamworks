@@ -114,7 +114,11 @@ void Robot::OperatorControl()
 		}
 
 		if(driveStick.GetPOV() != -1 && gyroValid) { //turn to angle 0, 90, 180, 270
-			angleOutput = pid.PIDAngle(angle, driveStick.GetPOV()); //call pid loop
+			if (driveStick.GetPOV() == 0) {
+				angleOutput = pid.PIDAngle(angle, 1);
+			} else {
+				angleOutput = pid.PIDAngle(angle, driveStick.GetPOV()); //call pid loop
+			}
 		} else {
 			pid.resetPIDAngle(); //if loop is done reset values
 		}
