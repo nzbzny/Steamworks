@@ -40,8 +40,8 @@ Robot::Robot() :
 		aimer(),
 		leftProx(1, 0),
 		rightProx(3, 2),
-		leftIR(4),
-		rightIR(5),
+		leftIR(5),
+		rightIR(4),
 		gear(Constants::gearReleaseInSole, Constants::gearReleaseOutSole),
 		shooter(Constants::rotatorChannel, Constants::shooterChannel, Constants::agitatorChannel),
 		compressor(Constants::compressorPin)
@@ -114,11 +114,7 @@ void Robot::OperatorControl()
 		}
 
 		if(driveStick.GetPOV() != -1 && gyroValid) { //turn to angle 0, 90, 180, 270
-			if (driveStick.GetPOV() == 0) {
-				angleOutput = pid.PIDAngle(angle, 1);
-			} else {
-				angleOutput = pid.PIDAngle(angle, driveStick.GetPOV()); //call pid loop
-			}
+			angleOutput = pid.PIDAngle(angle, driveStick.GetPOV()); //call pid loop
 		} else {
 			pid.resetPIDAngle(); //if loop is done reset values
 		}
@@ -197,6 +193,7 @@ void Robot::OperatorControl()
 		SmartDashboard::PutBoolean("calibrateButtonPushed", calibrating);
 
 		SmartDashboard::PutNumber("voltage", voltage);
+		SmartDashboard::PutNumber("Ultrasonic Filter", pid.ultrasonicFilter(leftProx.GetRangeInches(), rightProx.GetRangeInches()));
 	}
 	//gearMoveThreadRunBool = false;
 	//gearMoveThread.join();
@@ -213,7 +210,7 @@ void Robot::Autonomous() {
 	int failsafe = 0;
 	float tryAngle = 0.0;//This is the angle to which the robot will try to aim
 	bool isDone;
-	switch((int)SmartDashboard::GetNumber("Starting Position", 1))//This gets the starting position from the user
+	switch(1)//(int)SmartDashboard::GetNumber("Starting Position", 1))//This gets the starting position from the user
 	{
 	case 1://Position 1: straight from the middle peg
 		tryAngle = 0.0;
@@ -274,6 +271,7 @@ void Robot::Autonomous() {
 		{
 			float angleChangle = pid.PIDAngle(gyro.GetYaw(), aimer.GetAngleToGear() + gyro.GetYaw() + 20 * sign);
 			robotDrive.MecanumDrive_Cartesian(0, 0.0, angleChangle);
+			SmartDashboard::PutNumber("Angle to Gear", aimer.GetAngleToGear());
 			frc::Wait(.01);
 			failsafe++;
 			bigFailsafe++;
@@ -283,6 +281,7 @@ void Robot::Autonomous() {
 		{
 			float angleChangle = pid.PIDAngle(gyro.GetYaw(), aimer.GetAngleToGear() + gyro.GetYaw() + 20 * sign);
 			robotDrive.MecanumDrive_Cartesian(0, -0.5, angleChangle);
+			SmartDashboard::PutNumber("Angle to Gear", aimer.GetAngleToGear());
 			frc::Wait(.01);
 			failsafe++;
 		}
@@ -291,17 +290,24 @@ void Robot::Autonomous() {
 		{
 			float angleChangle = pid.PIDAngle(gyro.GetYaw(), aimer.GetAngleToGear() + gyro.GetYaw());
 			robotDrive.MecanumDrive_Cartesian(0, 0.0, angleChangle);
+			SmartDashboard::PutNumber("Angle to Gear", aimer.GetAngleToGear());
 			frc::Wait(.01);
 			failsafe++;
 		}
 		failsafe = 0;
 	}
 
-	while((!leftIR.Get() || !rightIR.Get()) && failsafe < 200 && !IsOperatorControl())
+	while(pid.ultrasonicFilter(leftProx.GetRangeInches(), rightProx.GetRangeInches()) > 12 && failsafe < 200 && !IsOperatorControl())
 	{
 		float angleChangle = pid.PIDAngle(gyro.GetYaw(), aimer.GetAngleToGear() + gyro.GetYaw());
 		float driveSpeed = 0.5 - ((getAverageDistance(leftProx, rightProx) / 80) - 0.5);
 		robotDrive.MecanumDrive_Cartesian(0, -driveSpeed, angleChangle);
+		SmartDashboard::PutNumber("Angle to Gear", aimer.GetAngleToGear());
+		SmartDashboard::PutNumber("leftProx", leftProx.GetRangeInches());
+		SmartDashboard::PutNumber("rightProx", rightProx.GetRangeInches());
+		SmartDashboard::PutNumber("leftIR", leftIR.Get());
+		SmartDashboard::PutNumber("rightIR", rightIR.Get());\
+		SmartDashboard::PutNumber("Ultrasonic Filter", pid.ultrasonicFilter(leftProx.GetRangeInches(), rightProx.GetRangeInches()));
 		frc::Wait(.01);
 		failsafe++;
 	}

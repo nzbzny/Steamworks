@@ -78,7 +78,10 @@ float PIDLoop::PIDAngle(float angleOffset, float desiredAngle) {
   logger << "Loop entered\n";
 
   angle_error = angleOffset - desiredAngle; //calculate error
-  angle_error = fabs(angle_error) > 180 ? -(angle_error - 180) : angle_error; //scale error to take shortest path
+  angle_error = fabs(angle_error) > 180 ? 180 - angle_error : angle_error; //scale error to take shortest path
+  if (desiredAngle == 0 && angleOffset > 180) {
+		  angle_error = angleOffset - 360;
+  }
 
   p_Angle = k_p_Angle * angle_error; //calculate p
   i_Angle += k_i_Angle * (angle_error * iteration_time); //calculate i
@@ -168,7 +171,7 @@ float PIDLoop::PIDX(float angleToGear) {
 	  i_X = 0;
   }
 
-  frc::Wait(iteration_time);
+  //frc::Wait(iteration_time);
 
   logger.close(); //close logger
 
@@ -183,7 +186,8 @@ float PIDLoop::PIDY(float lDistance, float rDistance) {
   std::ofstream logger; logger.open("/var/loggerFile.txt", std::ofstream::out); //start logger
   logger << "Loop entered\n";
   if (lDistance > 0 && lDistance < 100 && rDistance > 0 && rDistance < 100) { //if both distances are within range to go to a gear
-	  averageDistance = (lDistance + rDistance) / 2;
+	  //averageDistance = (lDistance + rDistance) / 2;
+	  averageDistance = ultrasonicFilter(lDistance, rDistance);
   }
   else if ((lDistance < 0 || lDistance > 100) && (rDistance > 0 && rDistance < 100)) { //if left sensor is outside of range to move to gear
 	  averageDistance = rDistance;
@@ -209,7 +213,7 @@ float PIDLoop::PIDY(float lDistance, float rDistance) {
 	  i_Y = 0;
   }
 
-  frc::Wait(iteration_time);
+  //frc::Wait(iteration_time);
 
   logger.close(); //close logger
   SmartDashboard::PutNumber("y_error", y_error);
@@ -217,4 +221,18 @@ float PIDLoop::PIDY(float lDistance, float rDistance) {
   SmartDashboard::PutNumber("i_Y", i_Y);
 
   return -yOutput;
+}
+
+float PIDLoop::ultrasonicFilter(float left, float right) { //to smooth out the ultrasonic values
+	float leftOutput = 0;
+	float rightOutput = 0;
+	float gain = .2;
+
+	leftOutput = gain * left + (1 - gain) * lastLeftUltrasonic; //larry math
+	rightOutput = gain * right + (1 - gain) * lastRightUltrasonic;
+
+	lastLeftUltrasonic = left;
+	lastRightUltrasonic = right;
+
+	return (leftOutput + rightOutput) / 2; //average
 }
