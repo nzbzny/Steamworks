@@ -129,8 +129,11 @@ void Robot::OperatorControl()
 		}
 
 		if(driveStick.GetRawButton(Constants::moveToGearButton)) { //pid move
-			yOutput = pid.PIDY(leftProx.GetRangeInches(), rightProx.GetRangeInches());
-			xOutput = pid.PIDX(aimer.GetAngleToGear());
+			angleOutput = pid.PIDAngle(angle, 0); //TODO: get angle via function (closest angle of the 3 options?)
+			if (angleOutput == 0) {
+				xOutput = pid.ultrasonicFilter(leftProx.GetRangeInches(), rightProx.GetRangeInches()) > 45 ? pid.PIDX(aimer.GetAngleToGear()) : 0.0;
+				yOutput = (xOutput < .01) ? pid.PIDY(leftProx.GetRangeInches(), rightProx.GetRangeInches()) : 0.0;
+			}
 		} else { //if loop is done reset values
 			pid.resetPIDX();
 			pid.resetPIDY();
@@ -170,7 +173,7 @@ void Robot::OperatorControl()
 		} //should be able to reopen the thread after it's closed by the cancel button*/ //thread code - not needed right now
 
 
-		frc::Wait(0.005); // wait 5ms to avoid hogging CPU cycles
+		frc::Wait(0.01); // wait 5ms to avoid hogging CPU cycles TODO: change back to .005
 		SmartDashboard::PutNumber("leftProx", leftProx.GetRangeInches());
 		SmartDashboard::PutNumber("rightProx", rightProx.GetRangeInches());
 		SmartDashboard::PutBoolean("leftIR", !leftIR.Get());

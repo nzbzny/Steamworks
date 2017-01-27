@@ -27,10 +27,10 @@ namespace Constants {
   static constexpr float angle_p_default = .025;
   static constexpr float angle_i_default = .001;
   static constexpr float angle_d_default = .001;
-  static constexpr float y_p_default = .025;
+  static constexpr float y_p_default = .005;
   static constexpr float y_i_default = .001;
   static constexpr float y_d_default = .001;
-  static constexpr float x_p_default = .025;
+  static constexpr float x_p_default = .013;
   static constexpr float x_i_default = .001;
   static constexpr float x_d_default = .001;
 

@@ -33,7 +33,7 @@ PIDLoop::PIDLoop() {
   x_error = 0;
   last_x_error = 0;
   xOutput = 0;
-  xMaxError = 0;
+  xMaxError = 3; //TODO: may have to play around with this number
 
 }
 
@@ -166,12 +166,13 @@ float PIDLoop::PIDX(float angleToGear) {
   xOutput = fabs(xOutput) > .7 ? std::copysign(.7, xOutput) : xOutput; //if xOutput is above max, set to max
   xOutput = fabs(xOutput) < .2 ? std::copysign(.2, xOutput) : xOutput; //if xOutput is below min, set to min
 
-  if (x_error < xMaxError) { //if done
+  if (fabs(x_error) < xMaxError) { //if done
 	  xOutput = 0;
 	  i_X = 0;
   }
 
   //frc::Wait(iteration_time);
+  //frc::Wait(.005);
 
   logger.close(); //close logger
 
@@ -188,11 +189,14 @@ float PIDLoop::PIDY(float lDistance, float rDistance) {
   if (lDistance > 0 && lDistance < 100 && rDistance > 0 && rDistance < 100) { //if both distances are within range to go to a gear
 	  //averageDistance = (lDistance + rDistance) / 2;
 	  averageDistance = ultrasonicFilter(lDistance, rDistance);
+	  SmartDashboard::PutString("PIDY Avg. Dist. Loop", "ultrasonicFilter");
   }
   else if ((lDistance < 0 || lDistance > 100) && (rDistance > 0 && rDistance < 100)) { //if left sensor is outside of range to move to gear
 	  averageDistance = rDistance;
+	  SmartDashboard::PutString("PIDY Avg. Dist. Loop", "rDistance");
   } else if ((rDistance < 0 || rDistance > 100) && (lDistance > 0 && lDistance < 100)) { //if right sensor is outside of range to move to gear
 	  averageDistance = lDistance;
+	  SmartDashboard::PutString("PIDY Avg. Dist. Loop", "lDistance");
   } else {
 	  SmartDashboard::PutString("PIDY Status", "Ultrasonic Error");
 	  return 0;
