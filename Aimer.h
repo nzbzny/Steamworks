@@ -12,12 +12,15 @@ public:
 
 	std::shared_ptr<NetworkTable> table;
 
-	float GetAngleToGear();
+	float GetLeftAngleToGear();
+	float GetRightAngleToGear();
 	float GetAngleToShoot();
 	float GetSpeedToShoot();
-	float GetDistanceToGear();
+	float Distancinator();
 	float GetOffset();
 	int GetAge();
+	void DeleteUnused();
+	float twoCameraAngleFilter();
 };
 
 #endif

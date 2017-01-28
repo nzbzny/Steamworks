@@ -10,25 +10,52 @@ namespace Constants {
   static constexpr int rearRightDriveChannel = 0;
   static constexpr int driveStickChannel = 0;
   static constexpr int operatorStickChannel = 1;
+  static constexpr int gearReleaseInSole = 99;
+  static constexpr int gearReleaseOutSole = 99;
+  static constexpr int rotatorChannel = 99;
+  static constexpr int shooterChannel = 99;
+  static constexpr int agitatorChannel = 99;
+  static constexpr int compressorPin = 99;
+  static constexpr int driveXAxis = 0;
+  static constexpr int driveYAxis = 1;
+  static constexpr int driveZAxis = 2;
+  static constexpr int driveThrottleAxis = 3;
+  static constexpr int intakeMotorPin = 99;
+  static constexpr int verticalConveyorMotorPin = 99;
 
-  //Gear PID loop
-  static constexpr float angleP = -.01;
-  static constexpr float angleI = .01;
-  static constexpr float angleD = .01;
-  static constexpr float xOffsetP = .01;
-  static constexpr float xOffsetI = .01;
-  static constexpr float xOffsetD = .01;
-  static constexpr float angleMaxError = 1;
-  static constexpr float xMaxError = 3;
-  static constexpr float gearPIDIterationTime = .006; //max update rate of the gyro is .005 - TODO: will need to change based on how fast the camera updates
-  static constexpr float angleOutputMin = -.5;
-  static constexpr float angleOutputMax = .5;
-  static constexpr float xOutputMin = -1.0;
-  static constexpr float xOutputMax = 1.0;
+  //PID
+  static constexpr float angle_p_default = .025;
+  static constexpr float angle_i_default = .001;
+  static constexpr float angle_d_default = .001;
+  static constexpr float y_p_default = .005;
+  static constexpr float y_i_default = .001;
+  static constexpr float y_d_default = .001;
+  static constexpr float x_p_default = .013;
+  static constexpr float x_i_default = .001;
+  static constexpr float x_d_default = .001;
+
 
   //Joystick Buttons
   static constexpr int runGearMoveThreadButton = 99;
   static constexpr int cancelGearMoveThreadButton = 99;
+  static constexpr int turnToGearButton = 1;
+  static constexpr int moveToGearButton = 2;
+  static constexpr int driveOneAxisButton = 3;
+  static constexpr int gearReleaseButton = 99;
+
+  //Joystick scaling constants
+  static constexpr float driveXDeadZone = .2;
+  static constexpr float driveXMax = 1;
+  static constexpr int driveXDegree = 1;
+  static constexpr float driveYDeadZone = .2;
+  static constexpr float driveYMax = 1;
+  static constexpr int driveYDegree = 1;
+  static constexpr float driveZDeadZone = .2;
+  static constexpr float driveZMax = .375;
+  static constexpr int driveZDegree = 1;
+
+  //Shooter
+  static constexpr int shooterMaxSpeed = 512; //TODO: temp
 
 };
 #endif

@@ -42,9 +42,14 @@ class PIDLoop {
   float xOutput;
   float xMaxError = 0;
 
+  float lastLeftUltrasonic = 0;
+  float lastRightUltrasonic = 0;
+
 public:
 	PIDLoop();
 	void resetPIDAngle();
+  void resetPIDX();
+  void resetPIDY();
 	void setAngle(float pAngleInput, float iAngleInput, float dAngleInput);
 	void setX(float pXInput, float iXInput, float dXInput);
 	void setY(float pYInput, float iYInput, float dYInput);
@@ -52,6 +57,7 @@ public:
 	//float PIDX(float distance, float angleOffset, float cameraOffset);
 	float PIDX(float angleToGear);
 	float PIDY(float lDistance, float rDistance);
+	float ultrasonicFilter(float left, float right);
 };
 
 #endif

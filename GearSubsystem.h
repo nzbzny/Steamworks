@@ -6,11 +6,11 @@
 
 class GearSubsystem {
 
-	Pneumatics bottom;
+	Pneumatics bottomPneumatic;
 
 public:
 	GearSubsystem(uint32_t bottomInSole, uint32_t bottomOutSole);
-	void release(bool state);
+	void setBottom(bool state);
 	bool getBottom();
 };
 
