@@ -92,5 +92,13 @@ float Aimer::getXDistanceToGear() { //TODO: do math for if the gear is between t
 	perpendicular = leftDistance * sin(leftAngle * PI / 180);
 	dX = sqrt(pow(leftDistance, 2) - pow(perpendicular, 2));
 	dExt = dX - dCam;
-	return dExt;
+	SmartDashboard::PutNumber("aimerLeftAngle", leftAngle);
+	SmartDashboard::PutNumber("aimerRightAngle", rightAngle);
+	SmartDashboard::PutNumber("topAngle", topAngle);
+	SmartDashboard::PutNumber("leftDistance", leftDistance);
+	SmartDashboard::PutNumber("perpendicular", perpendicular);
+	SmartDashboard::PutNumber("dX", dX);
+	SmartDashboard::PutNumber("dExt", dExt);
+	SmartDashboard::PutNumber("xDistanceToGear", dExt + (dCam / 2));
+	return dExt + (dCam / 2); //distance to the middle of the robot
 }
