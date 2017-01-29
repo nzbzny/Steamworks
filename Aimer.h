@@ -4,6 +4,7 @@
 #ifndef SRC_AIMER_H
 #define SRC_AIMER_H
 
+#define PI 3.14159265
 
 class Aimer
 {
@@ -21,6 +22,7 @@ public:
 	int GetAge();
 	void DeleteUnused();
 	float twoCameraAngleFilter();
+	float getXDistanceToGear();
 };
 
 #endif

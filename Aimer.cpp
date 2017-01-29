@@ -47,6 +47,50 @@ float Aimer::Distancinator()
 void Aimer::DeleteUnused() {
 }
 
-float Aimer::twoCameraAngleFilter() {
-	return -(GetLeftAngleToGear() + GetRightAngleToGear()) / 2.0;
+float Aimer::twoCameraAngleFilter() { //TODO: do math for if the gear is between the cameras
+	float leftAngle = fabs(GetLeftAngleToGear());
+	float rightAngle = fabs(GetRightAngleToGear());
+	float topAngle;
+	float leftDistance;
+	float perpendicular;
+	float dX;
+	float dExt;
+	float dCTot;
+	float center;
+	float centerAngle;
+	float dCam = 18.5; //TODO: I think this is a value but need to check
+	if (leftAngle < 0 && rightAngle < 0) {
+		topAngle = leftAngle - rightAngle; //TODO: may have to flip signs
+	} else if (leftAngle > 0 && rightAngle > 0) {
+		topAngle = rightAngle - leftAngle; //TODO: may have to flip signs
+	}
+	leftDistance = (dCam * sin(rightAngle * PI / 180)) / sin(topAngle * PI / 180);
+	perpendicular = leftDistance * sin(leftAngle * PI / 180);
+	dX = sqrt(pow(leftDistance, 2) - pow(perpendicular, 2));
+	dExt = dX - dCam;
+	dCTot = (dCam / 2) + dExt;
+	center = sqrt(pow(dCTot, 2) - pow(perpendicular, 2));
+	centerAngle = asin(perpendicular / center) * 180 / PI;
+	return centerAngle;
+}
+
+float Aimer::getXDistanceToGear() { //TODO: do math for if the gear is between the cameras
+	float leftAngle = fabs(GetLeftAngleToGear());
+	float rightAngle = fabs(GetRightAngleToGear());
+	float topAngle;
+	float leftDistance;
+	float perpendicular;
+	float dX;
+	float dExt;
+	float dCam = 18.5; //TODO: I think this is a value but need to check
+	if (leftAngle < 0 && rightAngle < 0) {
+		topAngle = leftAngle - rightAngle; //TODO: may have to flip signs
+	} else if (leftAngle > 0 && rightAngle > 0) {
+		topAngle = rightAngle - leftAngle; //TODO: may have to flip signs
+	}
+	leftDistance = (dCam * sin(rightAngle * PI / 180)) / sin(topAngle * PI / 180);
+	perpendicular = leftDistance * sin(leftAngle * PI / 180);
+	dX = sqrt(pow(leftDistance, 2) - pow(perpendicular, 2));
+	dExt = dX - dCam;
+	return dExt;
 }
