@@ -71,6 +71,16 @@ float Aimer::twoCameraAngleFilter() { //TODO: do math for if the gear is between
 	dCTot = (dCam / 2) + dExt;
 	center = sqrt(pow(dCTot, 2) - pow(perpendicular, 2));
 	centerAngle = asin(perpendicular / center) * 180 / PI;
+	SmartDashboard::PutNumber("aimerLeftAngle", leftAngle);
+	SmartDashboard::PutNumber("aimerRightAngle", rightAngle);
+	SmartDashboard::PutNumber("topAngle", topAngle);
+	SmartDashboard::PutNumber("leftDistance", leftDistance);
+	SmartDashboard::PutNumber("perpendicular", perpendicular);
+	SmartDashboard::PutNumber("dX", dX);
+	SmartDashboard::PutNumber("dExt", dExt);
+	SmartDashboard::PutNumber("dCTot", dCTot);
+	SmartDashboard::PutNumber("center", center);
+	SmartDashboard::PutNumber("centerAngle", centerAngle);
 	return centerAngle;
 }
 
