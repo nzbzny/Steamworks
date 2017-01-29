@@ -215,6 +215,9 @@ void Robot::OperatorControl()
 		SmartDashboard::PutNumber("distancinator", aimer.Distancinator());
 
 		SmartDashboard::PutNumber("native yaw", gyro.GetYaw());
+		
+		aimer.twoCameraAngleFilter();
+		aimer.getXDistanceToGear();
 
 
 	}
