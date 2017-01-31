@@ -90,6 +90,7 @@ void Robot::OperatorControl()
 	bool shooterShootButtonPressed = false;
 	bool shooting = false;
 	float shooterSpeed = 0.0;
+	bool shooterAngleReached = true;
 
 	bool gearButtonPressed = false;
 	int gearOpenCounter = 0;
@@ -119,6 +120,15 @@ void Robot::OperatorControl()
 		 angle = gyro.GetYaw() < 0 ? 360 + gyro.GetYaw() : gyro.GetYaw();
 		 yOutput = 0; //reset output
 		 xOutput = 0;
+		 if (driveStick.GetRawButton(Constants::cancelAllButton)) {
+			 shooterAutoAngleButtonPressed = true;
+			 shooterShootButtonPressed = true;
+			 shooting = false;
+			 shooterSpeed = 0.0;
+			 shooterAngleReached = true;
+			 gearButtonPressed = true;
+			 gearOpenCounter = 1000;
+		 }
 
 		/*
 		 *
