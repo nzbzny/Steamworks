@@ -51,4 +51,3 @@ void ShooterSubsystem::stop() {
 	agitate(0);
 	setSpeed(0);
 }
-
