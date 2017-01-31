@@ -17,7 +17,7 @@ public:
 	void disable();
 	void agitate(float speed);
 	void move(float moveValue);
-	void setAngle(float angle);
+	bool setAngle(float angle);
 	void setSpeed(float speed);
 	void shoot(float speed);
 	void stop();
