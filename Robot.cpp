@@ -86,6 +86,7 @@ void Robot::OperatorControl()
 	bool resetButtonPush;
 	bool calibrating;
 	float currentAngle = 0;
+	bool shooterAngleReached = true;
 
 	Timer loopTimer;
 
@@ -178,6 +179,14 @@ void Robot::OperatorControl()
 			driveX = 0;
 			driveY = 0;
 		}
+	}
+		
+	if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) {
+		shooterAngleReached = shooter.setAngle(0); //TODO: need to get angle from tj's vision code
+	}
+	    
+	if (!shooterAngleReached) {
+		shooterAngleReached = shooter.setAngle(0); //TODO: get angle from tj's vision code
 	}
 
 	driveX = fabs(driveX + xOutput) > 1 ? std::copysign(1, driveX + xOutput) : driveX + xOutput;
