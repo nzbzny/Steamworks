@@ -163,6 +163,15 @@ void Robot::OperatorControl()
 		}
 	}
 
+		
+	if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) {
+		shooterAngleReached = shooter.setAngle(0); //TODO: need to get angle from tj's vision code
+	}
+	    
+	if (!shooterAngleReached) {
+		shooterAngleReached = shooter.setAngle(0); //TODO: get angle from tj's vision code
+	}
+	    
 	driveX = fabs(driveX + xOutput) > 1 ? std::copysign(1, driveX + xOutput) : driveX + xOutput;
 	driveY = fabs(driveY + yOutput) > 1 ? std::copysign(1, driveY + yOutput) : driveY + yOutput;
 	driveZ = fabs(driveZ + angleOutput) > 1 ? std::copysign(1, driveZ + angleOutput) : driveZ + angleOutput;
