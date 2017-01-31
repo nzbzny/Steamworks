@@ -125,10 +125,20 @@ void Robot::OperatorControl()
 			currentAngle = angle;
 		}
 
-		if(driveStick.GetRawButton(Constants::gearReleaseButton)) { //TODO: may need to swap values
-			gear.setBottom(true);
+		if(driveStick.GetRawButton(Constants::gearReleaseButton) && !gearButtonPressed) { //TODO: may need to swap values
+			gear.setBottom(!gear.getBottom()); //set to the opposite of what it currently is
+			gearButtonPressed = true; //button still pressed = true
+		} else if (!driveStick.GetRawButton(Constants::gearReleaseButton)) { //button not pressed - so it doesn't keep flipping between open and closed
+			gearButtonPressed = false; //button not pressed
+		}
+		if (gear.getBottom()) { //TODO: may need to make a not
+			gearOpenCounter++; //timer for how long the gear is open before the operator just forgot to close it
 		} else {
-			gear.setBottom(false);
+			gearOpenCounter = 0; //reset gear open counter
+		}
+		if (gearOpenCounter > gearOpenMaxCount) { //if it's been open for more than 10 seconds
+			gear.setBottom(!gear.getBottom()); //set to closed
+			gearOpenCounter = 0;
 		}
 
 		if(driveStick.GetPOV() != -1 && gyroValid && (driveStick.GetPOV() % 90 == 0)) { //turn to angle 0, 90, 180, 270
@@ -181,11 +191,17 @@ void Robot::OperatorControl()
 		}
 	}
 		
-	if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) {
-		shooterAngleReached = shooter.setAngle(0); //TODO: need to get angle from tj's vision code
+	if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) && !shooterButtonPressed && !shooterAngleReached) { //if the shooter has been started and the button was let go and then pressed
+		shooterAngleReached = true; //cancel shooter auto aim
 	}
-	    
-	if (!shooterAngleReached) {
+	if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) && !shooterButtonPressed && shooterAngleReached)  { //if the shooter has not been started and the button was let go and then pressed
+		shooterAngleReached = shooter.setAngle(0); //TODO: need to get angle from tj's vision code
+		shooterButtonPressed = true; //set button pressed to true so that holding the button for more than 10ms (loop time) doesn't activate the loop above and cancel it
+	}
+	if (!driveStick.GetRawButton(Constants::shooterAutoAngleButton) { //if the shooter button has been let go
+		shooterButtonPressed = false; //set to false so it can be pressed again
+	}
+	if (!shooterAngleReached) { //if the shooter angle hasn't yet been reached
 		shooterAngleReached = shooter.setAngle(0); //TODO: get angle from tj's vision code
 	}
 
