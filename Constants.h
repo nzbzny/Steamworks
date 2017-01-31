@@ -42,6 +42,7 @@ namespace Constants {
   static constexpr int moveToGearButton = 2;
   static constexpr int driveOneAxisButton = 3;
   static constexpr int gearReleaseButton = 99;
+  static constexpr int shooterAutoAngleButton = 99;
 
   //Joystick scaling constants
   static constexpr float driveXDeadZone = .2;
