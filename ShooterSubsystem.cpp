@@ -27,8 +27,15 @@ void ShooterSubsystem::move(float moveValue) { //rotate the shooter at a speed (
   rotator.Set(moveValue);
 }
 
-void ShooterSubsystem::setAngle(float angle) {
-
+bool ShooterSubsystem::setAngle(float angle) { //return true when completed
+  float currentAngle = 0; //get current angle
+  if (fabs(currentAngle - angle) > 1) {
+    setSpeed(.25);
+    return false;
+  } else {
+    setSpeed(0.0);
+    return true;
+  }
 }
 
 void ShooterSubsystem::setSpeed(float speed) { //set speed to shoot the balls at
@@ -44,4 +51,3 @@ void ShooterSubsystem::stop() {
 	agitate(0);
 	setSpeed(0);
 }
-
