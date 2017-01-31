@@ -5,6 +5,7 @@
 #include "AHRS.h"
 #include "GearSubsystem.h"
 #include "ShooterSubsystem.h"
+#include "IR.h"
 #include "CANTalon.h"
 #include <math.h>
 #include <thread>
@@ -29,8 +30,8 @@ class Robot : public SampleRobot {
 	Aimer aimer;
 	Ultrasonic leftProx;
 	Ultrasonic rightProx;
-	DigitalInput leftIR;
-	DigitalInput rightIR;
+	IR leftIR;
+	IR rightIR;
 	GearSubsystem gear;
 	ShooterSubsystem shooter;
 	Compressor compressor;

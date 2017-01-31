@@ -71,6 +71,7 @@ void Robot::OperatorControl()
 	pid.setY(SmartDashboard::GetNumber("y_p", Constants::y_p_default), SmartDashboard::GetNumber("y_i", Constants::y_i_default), SmartDashboard::GetNumber("y_d", Constants::y_d_default));
 	pid.setX(SmartDashboard::GetNumber("x_p", Constants::x_p_default), SmartDashboard::GetNumber("x_i", Constants::x_i_default), SmartDashboard::GetNumber("x_d", Constants::x_d_default));
 	gyro.ZeroYaw();
+
 	float driveX;
 	float driveY;
 	float driveZ;
@@ -79,14 +80,23 @@ void Robot::OperatorControl()
 	float gearAngle = 0;
 	float yOutput;
 	float xOutput;
+
 	float voltage = 0; //testing data for battery voltage
 	bool gyroValid;
 	bool resetButtonPush;
 	bool calibrating;
-	bool shooterButtonPressed;
-	bool gearButtonPressed;
+
+	bool shooterAutoAngleButtonPressed = false;
+	bool shooterShootButtonPressed = false;
+	bool shooting = false;
+	float shooterSpeed = 0.0;
+
+	bool gearButtonPressed = false;
 	int gearOpenCounter = 0;
 	int gearOpenMaxCount = 1000;
+
+	bool oneAxisButtonPressed = false;
+	float oneAxisDesiredAngle = 0.0;
 
 	leftProx.SetAutomaticMode(true);
 	rightProx.SetAutomaticMode(true);
@@ -95,21 +105,73 @@ void Robot::OperatorControl()
 
 	while (IsOperatorControl() && IsEnabled())
 	{
-		angleOutput = 0; //reset output so that if the pid loop isn't being called it's not reserved from the last time it's called
-		angle = gyro.GetYaw() < 0 ? 360 + gyro.GetYaw() : gyro.GetYaw();
-		yOutput = 0; //reset output
-		xOutput = 0;
-		voltage = DriverStation::GetInstance().GetBatteryVoltage();
 
+		/*
+		 *
+		 * BASIC CHECKS
+		 *
+		 */
 
-		gyroValid = gyro.IsConnected();
-		resetButtonPush = driveStick.GetRawButton(11);
-		if (resetButtonPush)
-		{
-			gyro.ResetDisplacement();
-			SmartDashboard::PutString("Status Update", "Gyro Displacement Reset");
+		 gyroValid = gyro.IsConnected();
+		 calibrating = gyro.IsCalibrating();
+		 voltage = DriverStation::GetInstance().GetBatteryVoltage();
+		 angleOutput = 0; //reset output so that if the pid loop isn't being called it's not reserved from the last time it's called
+		 angle = gyro.GetYaw() < 0 ? 360 + gyro.GetYaw() : gyro.GetYaw();
+		 yOutput = 0; //reset output
+		 xOutput = 0;
+
+		/*
+		 *
+		 * END BASIC CHECKS
+		 *
+		 */
+
+		/*
+		 *
+		 * SHOOTER CODE
+		 *
+		 */
+
+		if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) && !shooterButtonPressed && !shooterAngleReached) { //if the shooter has been started and the button was let go and then pressed
+			shooterAngleReached = true; //cancel shooter auto aim
 		}
-		calibrating = gyro.IsCalibrating();
+		if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) && !shooterButtonPressed && shooterAngleReached)  { //if the shooter has not been started and the button was let go and then pressed
+			shooterAngleReached = shooter.setAngle(0); //TODO: need to get angle from tj's vision code
+			shooterButtonPressed = true; //set button pressed to true so that holding the button for more than 10ms (loop time) doesn't activate the loop above and cancel it
+		}
+		if (!driveStick.GetRawButton(Constants::shooterAutoAngleButton) { //if the shooter button has been let go
+			shooterButtonPressed = false; //set to false so it can be pressed again
+		}
+		if (!shooterAngleReached) { //if the shooter angle hasn't yet been reached
+			shooterAngleReached = shooter.setAngle(0); //TODO: get angle from tj's vision code
+		}
+		if (driveStick.GetRawButton(Constants::shooterShootButton) && !shooterShootButtonPressed && !shooting) { //shoot
+			//TODO: get shooter speed
+			shooter.shoot(shooterSpeed); //shoot at the speed
+			shooterShootButtonPressed = true; //button is pressed so it doesn't immediately cancel
+			shooting = true; //set shooting to true so it knows next time the button is pressed to cancel
+		} else if (driveStick.GetRawButton(Constants::shooterShootButton) && !shooterShootButtonPressed && shooting) { //cancel
+			shooter.stop(); //turn off shooter
+			shooterShootButtonPressed = true; //so it doesn't immediately start shooting again
+			shooting = false; //so it knows what loop to go into
+		}
+		if (!driveStick.GetRawButton(Constants::shooterShootButton)) { //when button is let go
+			shooterShootButtonPressed = false; //let shooter change state
+		}
+
+		/*
+		 *
+		 * END SHOOTER CODE
+		 *
+		 */
+
+
+
+		/*
+		 *
+		 * GEAR CODE
+		 *
+		 */
 
 		if(driveStick.GetRawButton(Constants::gearReleaseButton) && !gearButtonPressed) { //TODO: may need to swap values
 			gear.setBottom(!gear.getBottom()); //set to the opposite of what it currently is
@@ -126,7 +188,20 @@ void Robot::OperatorControl()
 			gear.setBottom(!gear.getBottom()); //set to closed
 			gearOpenCounter = 0;
 		}
-		
+
+		/*
+		 *
+		 * END GEAR CODE
+		 *
+		 */
+
+
+		/*
+		 *
+		 * PID CODE
+		 *
+		 */
+
 		if(driveStick.GetPOV() != -1 && gyroValid) { //turn to angle 0, 90, 180, 270
 			angleOutput = pid.PIDAngle(angle, driveStick.GetPOV()); //call pid loop
 		} else {
@@ -143,15 +218,27 @@ void Robot::OperatorControl()
 		}
 
 		if(driveStick.GetRawButton(Constants::moveToGearButton)) { //pid move
-			angleOutput = pid.PIDAngle(angle, 0); //TODO: get angle via function (closest angle of the 3 options?)
+			angleOutput = pid.PIDAngle(angle, 0); //TODO: get angle via function (closest angle of the 3 options (0, 60, -60, find which is closest to current angle)?)
 			if (angleOutput == 0) {
-				xOutput = pid.ultrasonicFilter(leftProx.GetRangeInches(), rightProx.GetRangeInches()) > 45 ? pid.PIDX(aimer.GetAngleToGear()) : 0.0;
-				yOutput = (xOutput < .01) ? pid.PIDY(leftProx.GetRangeInches(), rightProx.GetRangeInches()) : 0.0;
+				xOutput = pid.ultrasonicFilter(leftProx.GetRangeInches(), rightProx.GetRangeInches()) > 45 ? pid.PIDX(aimer.GetAngleToGear()) : 0.0; //if done turning move x
+				yOutput = (xOutput < .01) ? pid.PIDY(leftProx.GetRangeInches(), rightProx.GetRangeInches()) : 0.0; //if done moving x move y
 			}
 		} else { //if loop is done reset values
 			pid.resetPIDX();
 			pid.resetPIDY();
 		}
+
+		/*
+		 *
+		 * END PID CODE
+		 *
+		 */
+
+		/*
+		 *
+		 * JOYSTICK CODE
+		 *
+		 */
 
 		//scaling for the joystick deadzones
 		driveX = driveStick.GetRawAxis(Constants::driveXAxis);
@@ -162,51 +249,53 @@ void Robot::OperatorControl()
 		driveY = scaleJoysticks(driveY, Constants::driveYDeadZone, Constants::driveYMax * (.5 - (driveStick.GetRawAxis(Constants::driveThrottleAxis) / 2)), Constants::driveYDegree);
 		driveZ = scaleJoysticks(driveZ, Constants::driveZDeadZone, Constants::driveZMax * (.5 - (driveStick.GetRawAxis(Constants::driveThrottleAxis) / 2)), Constants::driveZDegree);
 
-	if (driveStick.GetRawButton(Constants::driveOneAxisButton)) { //drive only one axis
-		if (fabs(driveX) > fabs(driveY) && fabs(driveX) > fabs(driveZ)) { //if X is greater than Y and Z, then it will only go in the direction of X
-			driveY = 0;
-			driveZ = 0;
+		if (driveStick.GetRawButton(Constants::driveOneAxisButton)) { //drive only one axis
+			if (!oneAxisButtonPressed) { //if not in the middle of being held down
+				oneAxisButtonPressed = true; //being held down now - don't reset desired angle
+				oneAxisDesiredAngle = angle; //set desired angle
+			}
+			if (fabs(driveX) > fabs(driveY) && fabs(driveX) > fabs(driveZ)) { //if X is greater than Y and Z, then it will only go in the direction of X
+				angleOutput = pid.PIDAngle(angle, oneAxisDesiredAngle); //stay straight
+				driveY = 0;
+				driveZ = 0;
+			}
+			else if (fabs(driveY) > fabs(driveX) && fabs(driveY) > fabs(driveZ)) { //if Y is greater than X and Z, then it will only go in the direction of Y
+				angleOutput = pid.PIDAngle(angle, oneAxisDesiredAngle); //stay straight
+				driveX = 0;
+				driveZ = 0;
+			}
+			else { //if Z is greater than X and Y, then it will only go in the direction of Z
+				driveX = 0;
+				driveY = 0;
+			}
+		} else {
+			oneAxisButtonPressed = false; //lets you reset the straight facing angle when you let go of the button
 		}
-		else if (fabs(driveY) > fabs(driveX) && fabs(driveY) > fabs(driveZ)) { //if Y is greater than X and Z, then it will only go in the direction of Y
-			driveX = 0;
-			driveZ = 0;
-		}
-		else { //if Z is greater than X and Y, then it will only go in the direction of Z
-			driveX = 0;
-			driveY = 0;
-		}
-	}
 
-	if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) && !shooterButtonPressed && !shooterAngleReached) { //if the shooter has been started and the button was let go and then pressed
-		shooterAngleReached = true; //cancel shooter auto aim
-	}
-	if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) && !shooterButtonPressed && shooterAngleReached)  { //if the shooter has not been started and the button was let go and then pressed
-		shooterAngleReached = shooter.setAngle(0); //TODO: need to get angle from tj's vision code
-		shooterButtonPressed = true; //set button pressed to true so that holding the button for more than 10ms (loop time) doesn't activate the loop above and cancel it
-	}
-	if (!driveStick.GetRawButton(Constants::shooterAutoAngleButton) { //if the shooter button has been let go
-		shooterButtonPressed = false; //set to false so it can be pressed again
-	}
-	if (!shooterAngleReached) { //if the shooter angle hasn't yet been reached
-		shooterAngleReached = shooter.setAngle(0); //TODO: get angle from tj's vision code
-	}
-	    
-	driveX = fabs(driveX + xOutput) > 1 ? std::copysign(1, driveX + xOutput) : driveX + xOutput;
-	driveY = fabs(driveY + yOutput) > 1 ? std::copysign(1, driveY + yOutput) : driveY + yOutput;
-	driveZ = fabs(driveZ + angleOutput) > 1 ? std::copysign(1, driveZ + angleOutput) : driveZ + angleOutput;
-
-	robotDrive.MecanumDrive_Cartesian(driveX + xOutput, driveY + yOutput, driveZ + angleOutput);
-/*		if (operatorStick.GetRawButton(Constants::runGearMoveThreadButton)) {
-			gearMoveThreadRunBool = true;
-		} //should be able to reopen the thread after it's closed by the cancel button*/ //thread code - not needed right now
+		driveX = fabs(driveX + xOutput) > 1 ? std::copysign(1, driveX + xOutput) : driveX + xOutput; //if driving and pid'ing (pls dont) maxes you out at 1 so the motors move
+		driveY = fabs(driveY + yOutput) > 1 ? std::copysign(1, driveY + yOutput) : driveY + yOutput; //if driving and pid'ing (pls dont) maxes you out at 1 so the motors move
+		driveZ = fabs(driveZ + angleOutput) > 1 ? std::copysign(1, driveZ + angleOutput) : driveZ + angleOutput; //if driving and pid'ing (pls dont) maxes you out at 1 so the motors move
 
 
-		frc::Wait(0.01); // wait 5ms to avoid hogging CPU cycles TODO: change back to .005
+		/*
+		 *
+		 * END JOYSTICK CODE
+		 *
+		 */
+
+		robotDrive.MecanumDrive_Cartesian(driveX + xOutput, driveY + yOutput, driveZ + angleOutput); //drive
+
+
+		/*
+		 *
+		 * SMART DASHBOARD
+		 *
+		 */
+
 		SmartDashboard::PutNumber("leftProx", leftProx.GetRangeInches());
 		SmartDashboard::PutNumber("rightProx", rightProx.GetRangeInches());
-		SmartDashboard::PutBoolean("leftIR", !leftIR.Get());
-		SmartDashboard::PutBoolean("rightIR", !rightIR.Get());
-
+		SmartDashboard::PutBoolean("leftIR", leftIR.Get());
+		SmartDashboard::PutBoolean("rightIR", rightIR.Get());
 		SmartDashboard::PutNumber("Angle to gear (aimer)", aimer.GetAngleToGear());
 		SmartDashboard::PutNumber("angleOutput", angleOutput);
 		SmartDashboard::PutNumber("Angle", angle);
@@ -225,6 +314,14 @@ void Robot::OperatorControl()
 
 		SmartDashboard::PutNumber("voltage", voltage);
 		SmartDashboard::PutNumber("Ultrasonic Filter", pid.ultrasonicFilter(leftProx.GetRangeInches(), rightProx.GetRangeInches()));
+
+		/*
+		 *
+		 * END SMART DASHBOARD
+		 *
+		 */
+
+		frc::Wait(0.01); // wait 5ms to avoid hogging CPU cycles TODO: change back to .005 if necessary
 	}
 	//gearMoveThreadRunBool = false;
 	//gearMoveThread.join();
@@ -337,7 +434,7 @@ void Robot::Autonomous() {
 		SmartDashboard::PutNumber("leftProx", leftProx.GetRangeInches());
 		SmartDashboard::PutNumber("rightProx", rightProx.GetRangeInches());
 		SmartDashboard::PutNumber("leftIR", leftIR.Get());
-		SmartDashboard::PutNumber("rightIR", rightIR.Get());\
+		SmartDashboard::PutNumber("rightIR", rightIR.Get());
 		SmartDashboard::PutNumber("Ultrasonic Filter", pid.ultrasonicFilter(leftProx.GetRangeInches(), rightProx.GetRangeInches()));
 		frc::Wait(.01);
 		failsafe++;

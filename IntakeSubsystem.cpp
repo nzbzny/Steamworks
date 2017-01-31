@@ -12,9 +12,9 @@ IntakeSubsystem::IntakeSubsystem(int intakePin, int verticalConveyorPin) :
 {}
 
 void IntakeSubsystem::runIntake(float speed) {
-	intake.Set(speed);
+	intake.Set(speed); //set speed to take in balls at
 }
 
 void IntakeSubsystem::runVerticalConveyor(float speed) {
-	verticalConveyor.Set(speed);
+	verticalConveyor.Set(speed); //set speed of the vertical conveyor
 }
