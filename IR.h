@@ -8,7 +8,7 @@ class IR {
   DigitalInput ir;
   
 public:
-	IR(int channel);
+  IR(int channel);
   void get();
 };
 
