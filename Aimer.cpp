@@ -8,12 +8,12 @@ Aimer::Aimer()
 
 float Aimer::GetLeftAngleToGear()
 {
-	return (float)table->GetNumber("averageAzimuthOut-0", 42);
+	return (float)table->GetNumber("averageAzimuthOut-1", 42);
 }
 
 float Aimer::GetRightAngleToGear()
 {
-	return (float)table->GetNumber("averageAzimuthOut-1", 42);
+	return (float)table->GetNumber("averageAzimuthOut-0", 42);
 }
 
 
@@ -49,9 +49,9 @@ float Aimer::Distancinator()
 	float leftDistance;
 	float rightDistance;
 	float perpendicular;
-	float dCam = 18.5; //TODO: I think this is a value but need to check
+	float dCam = 15.75; //TODO: I think this is a value but need to check
 	if ((GetLeftAngleToGear() > 0 && GetRightAngleToGear() < 0) || (GetLeftAngleToGear() < 0 && GetRightAngleToGear() > 0)) {
-		topAngle  180 - (leftAngle + rightAngle);
+		topAngle = 180 - (leftAngle + rightAngle);
 		rightDistance = (dCam * sin(leftAngle * PI / 180)) / sin(topAngle * PI / 180);
 		perpendicular = rightDistance * sin(rightAngle * PI / 180);
 		SmartDashboard::PutNumber("aimerLeftAngle", leftAngle);
@@ -81,8 +81,8 @@ void Aimer::DeleteUnused() {
 }
 
 float Aimer::twoCameraAngleFilter() { //TODO: do math for if the gear is between the cameras
-	float leftAngle = fabs(GetLeftAngleToGear());
-	float rightAngle = fabs(GetRightAngleToGear());
+	float leftAngle;
+	float rightAngle;
 	float topAngle;
 	float leftDistance;
 	float perpendicular;
@@ -91,7 +91,7 @@ float Aimer::twoCameraAngleFilter() { //TODO: do math for if the gear is between
 	float dCTot;
 	float center;
 	float centerAngle;
-	float dCam = 18.5; //TODO: I think this is a value but need to check
+	float dCam = 15.75; //TODO: I think this is a value but need to check
 	if (leftAngle < 0 && rightAngle < 0) {
 		topAngle = leftAngle - rightAngle; //TODO: may have to flip signs
 	} else if (leftAngle > 0 && rightAngle > 0) {
@@ -117,18 +117,19 @@ float Aimer::twoCameraAngleFilter() { //TODO: do math for if the gear is between
 	return centerAngle;
 }
 
-float Aimer::getXDistanceToGear() { //TODO: do math for if the gear is between the cameras
-	float leftAngle = fabs(GetLeftAngleToGear());
-	float rightAngle = fabs(GetRightAngleToGear());
+/*float Aimer::getXDistanceToGear() { //TODO: do math for if the gear is between the cameras
+	float leftAngle = 90 - GetLeftAngleToGear();
+	float rightAngle = 90 - GetRightAngleToGear();
 	float topAngle;
 	float leftDistance;
 	float rightDistance;
 	float perpendicular;
 	float dX;
 	float dExt;
-	float dCam = 18.5; //TODO: I think this is a value but need to check
+
+	float dCam = 15.75; //TODO: I think this is a value but need to check
 	if ((GetLeftAngleToGear() > 0 && GetRightAngleToGear() < 0) || (GetLeftAngleToGear() < 0 && GetRightAngleToGear() > 0)) {
-		topAngle  180 - (leftAngle + rightAngle);
+		topAngle = 180 - (leftAngle + rightAngle);
 		rightDistance = (dCam * sin(leftAngle * PI / 180)) / sin(topAngle * PI / 180);
 		perpendicular = rightDistance * sin(rightAngle * PI / 180);
 		dX = rightDistance * cos(rightAngle * PI / 180);
@@ -142,8 +143,12 @@ float Aimer::getXDistanceToGear() { //TODO: do math for if the gear is between t
 		return ((dCam / 2) - dX);
 	} else {
 		if (GetLeftAngleToGear() < 0 && GetRightAngleToGear() < 0) {
+			leftAngle = 90 + GetLeftAngleToGear();
+			rightAngle = 90 - GetRightAngleToGear();
 			topAngle = leftAngle - rightAngle; //TODO: may have to flip signs
 		} else if (GetLeftAngleToGear() > 0 && GetRightAngleToGear() > 0) {
+			leftAngle = 90 - GetLeftAngleToGear();
+			rightAngle = 90 + GetRightAngleToGear();
 			topAngle = rightAngle - leftAngle; //TODO: may have to flip signs
 		}
 		leftDistance = (dCam * sin(rightAngle * PI / 180)) / sin(topAngle * PI / 180);
@@ -160,4 +165,24 @@ float Aimer::getXDistanceToGear() { //TODO: do math for if the gear is between t
 		SmartDashboard::PutNumber("xDistanceToGear", dExt + (dCam / 2));
 		return dExt + (dCam / 2); //distance to the middle of the robot
 	}
+}*/
+
+float Aimer::getXDistanceToGear() {
+	float leftAngle = 90 - fabs(GetLeftAngleToGear());
+	float rightAngle = 90 - fabs(GetRightAngleToGear());
+	float dExt;
+	float perpendicular;
+	float dCam = 15.75;
+	float xDistanceToGear;
+	perpendicular = ((1 / tan(leftAngle * PI / 180)) - dCam) / (1 / tan(rightAngle * PI / 180));
+	dExt = perpendicular * (1 / tan(leftAngle * PI / 180)) - dCam;
+	xDistanceToGear = dExt + dCam / 2;
+	SmartDashboard::PutNumber("aimerLeftAngle", leftAngle);
+	SmartDashboard::PutNumber("aimerRightAngle", rightAngle);
+	SmartDashboard::PutNumber("tanLeft", tan(leftAngle * PI / 180));
+	SmartDashboard::PutNumber("tanRight", tan(rightAngle * PI / 180));
+	SmartDashboard::PutNumber("xDistanceToGear", xDistanceToGear);
+	SmartDashboard::PutNumber("perpendicular", perpendicular);
+	SmartDashboard::PutNumber("dExt", dExt);
+	return 0;
 }

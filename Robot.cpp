@@ -87,13 +87,17 @@ void Robot::OperatorControl()
 	bool calibrating;
 	float currentAngle = 0;
 
+	Timer loopTimer;
+
 	leftProx.SetAutomaticMode(true);
 	rightProx.SetAutomaticMode(true);
 	shooter.enable();
 	compressor.Start();
 
+	loopTimer.Start();
 	while (IsOperatorControl() && IsEnabled())
 	{
+
 		angleOutput = 0; //reset output so that if the pid loop isn't being called it's not reserved from the last time it's called
 		angle = gyro.GetYaw() < 0 ? 360 + gyro.GetYaw() : gyro.GetYaw();
 		yOutput = 0; //reset output
@@ -215,11 +219,17 @@ void Robot::OperatorControl()
 		SmartDashboard::PutNumber("distancinator", aimer.Distancinator());
 
 		SmartDashboard::PutNumber("native yaw", gyro.GetYaw());
-		
-		aimer.twoCameraAngleFilter();
+
+		SmartDashboard::PutNumber("xMoveValue", driveX + xOutput);
+		SmartDashboard::PutNumber("yMoveValue", driveY + yOutput);
+		SmartDashboard::PutNumber("zMoveValue", driveZ + angleOutput);
+		SmartDashboard::PutBoolean("Is Moving", gyro.IsMoving());
+		SmartDashboard::PutNumber("xVelocity", gyro.GetVelocityX());
+		SmartDashboard::PutNumber("yVelocity", gyro.GetVelocityY());
+		//aimer.twoCameraAngleFilter();
 		aimer.getXDistanceToGear();
-
-
+		SmartDashboard::PutNumber("loop time", loopTimer.Get());
+		loopTimer.Reset();
 	}
 	//gearMoveThreadRunBool = false;
 	//gearMoveThread.join();
