@@ -59,6 +59,9 @@ namespace Constants {
 
   //Shooter
   static constexpr int shooterMaxSpeed = 512; //TODO: temp
+  
+  //Climber
+  static constexpr int climberMaxSpeed = 512; //TODO: temp
 
 };
 #endif
