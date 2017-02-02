@@ -5,6 +5,6 @@ IR::IR(int channel) :
   {}
     
 //flip the IR values
-void IR::get() {
+bool IR::get() {
   return !ir.Get();
 }

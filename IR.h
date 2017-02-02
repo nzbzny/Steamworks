@@ -9,7 +9,7 @@ class IR {
   
 public:
   IR(int channel);
-  void get();
+  bool get();
 };
 
 #endif

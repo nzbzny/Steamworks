@@ -142,15 +142,15 @@ void Robot::OperatorControl()
 		 *
 		 */
 
-		if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) && !shooterButtonPressed && !shooterAngleReached) { //if the shooter has been started and the button was let go and then pressed
+		if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) && !shooterAutoAngleButtonPressed && !shooterAngleReached) { //if the shooter has been started and the button was let go and then pressed
 			shooterAngleReached = true; //cancel shooter auto aim
 		}
-		if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) && !shooterButtonPressed && shooterAngleReached)  { //if the shooter has not been started and the button was let go and then pressed
+		if (driveStick.GetRawButton(Constants::shooterAutoAngleButton) && !shooterAutoAngleButtonPressed && shooterAngleReached)  { //if the shooter has not been started and the button was let go and then pressed
 			shooterAngleReached = shooter.setAngle(0); //TODO: need to get angle from tj's vision code
-			shooterButtonPressed = true; //set button pressed to true so that holding the button for more than 10ms (loop time) doesn't activate the loop above and cancel it
+			shooterAutoAngleButtonPressed = true; //set button pressed to true so that holding the button for more than 10ms (loop time) doesn't activate the loop above and cancel it
 		}
-		if (!driveStick.GetRawButton(Constants::shooterAutoAngleButton) { //if the shooter button has been let go
-			shooterButtonPressed = false; //set to false so it can be pressed again
+		if (!driveStick.GetRawButton(Constants::shooterAutoAngleButton)) { //if the shooter button has been let go
+			shooterAutoAngleButtonPressed = false; //set to false so it can be pressed again
 		}
 		if (!shooterAngleReached) { //if the shooter angle hasn't yet been reached
 			shooterAngleReached = shooter.setAngle(0); //TODO: get angle from tj's vision code
@@ -304,8 +304,8 @@ void Robot::OperatorControl()
 
 		SmartDashboard::PutNumber("leftProx", leftProx.GetRangeInches());
 		SmartDashboard::PutNumber("rightProx", rightProx.GetRangeInches());
-		SmartDashboard::PutBoolean("leftIR", leftIR.Get());
-		SmartDashboard::PutBoolean("rightIR", rightIR.Get());
+		SmartDashboard::PutBoolean("leftIR", leftIR.get());
+		SmartDashboard::PutBoolean("rightIR", rightIR.get());
 		SmartDashboard::PutNumber("Angle to gear (aimer)", aimer.GetAngleToGear());
 		SmartDashboard::PutNumber("angleOutput", angleOutput);
 		SmartDashboard::PutNumber("Angle", angle);
@@ -443,8 +443,8 @@ void Robot::Autonomous() {
 		SmartDashboard::PutNumber("Angle to Gear", aimer.GetAngleToGear());
 		SmartDashboard::PutNumber("leftProx", leftProx.GetRangeInches());
 		SmartDashboard::PutNumber("rightProx", rightProx.GetRangeInches());
-		SmartDashboard::PutNumber("leftIR", leftIR.Get());
-		SmartDashboard::PutNumber("rightIR", rightIR.Get());
+		SmartDashboard::PutNumber("leftIR", leftIR.get());
+		SmartDashboard::PutNumber("rightIR", rightIR.get());
 		SmartDashboard::PutNumber("Ultrasonic Filter", pid.ultrasonicFilter(leftProx.GetRangeInches(), rightProx.GetRangeInches()));
 		frc::Wait(.01);
 		failsafe++;
