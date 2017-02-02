@@ -83,7 +83,6 @@ void Robot::OperatorControl()
 
 	float voltage = 0; //testing data for battery voltage
 	bool gyroValid;
-	bool resetButtonPush;
 	bool calibrating;
 
 	bool shooterAutoAngleButtonPressed = false;
@@ -319,7 +318,6 @@ void Robot::OperatorControl()
 		SmartDashboard::PutNumber("yOutput", yOutput);
 		SmartDashboard::PutNumber("xOutput", xOutput);
 
-		SmartDashboard::PutBoolean("resetButtonPushed", resetButtonPush);
 		SmartDashboard::PutBoolean("calibrateButtonPushed", calibrating);
 
 		SmartDashboard::PutNumber("voltage", voltage);
@@ -386,7 +384,7 @@ void Robot::Autonomous() {
 			frc::Wait(.01);
 			failsafe++;
 		}
-		isDone = failsafe = 0;
+		isDone = (failsafe == 0);
 		while(!isDone && failsafe < 200 && !IsOperatorControl())
 		{
 			float angleChangle = pid.PIDAngle(gyro.GetYaw(), 60.0);
