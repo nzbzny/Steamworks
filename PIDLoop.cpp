@@ -43,13 +43,13 @@ void PIDLoop::resetPIDAngle() { //reset angle pid values
 	d_Angle = 0;
 }
 
-void PIDLoop::resetPIDX() {
+void PIDLoop::resetPIDX() { //reset x pid values
   p_X = 0;
   i_X = 0;
   d_X = 0;
 }
 
-void PIDLoop::resetPIDY() {
+void PIDLoop::resetPIDY() { //reset y pid values
   p_Y = 0;
   i_Y = 0;
   d_Y = 0;
@@ -186,6 +186,7 @@ float PIDLoop::PIDY(float lDistance, float rDistance) {
 
   std::ofstream logger; logger.open("/var/loggerFile.txt", std::ofstream::out); //start logger
   logger << "Loop entered\n";
+  //TODO: put these checks into the ultrasonic filter function
   if (lDistance > 0 && lDistance < 100 && rDistance > 0 && rDistance < 100) { //if both distances are within range to go to a gear
 	  //averageDistance = (lDistance + rDistance) / 2;
 	  averageDistance = ultrasonicFilter(lDistance, rDistance);
