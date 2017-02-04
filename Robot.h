@@ -6,6 +6,7 @@
 #include "GearSubsystem.h"
 #include "ShooterSubsystem.h"
 #include "IR.h"
+#include "Filters.h"
 #include "CANTalon.h"
 #include <math.h>
 #include <thread>
@@ -35,6 +36,7 @@ class Robot : public SampleRobot {
 	GearSubsystem gear;
 	ShooterSubsystem shooter;
 	Compressor compressor;
+	Filters filter;
 
 public:
 	Robot();

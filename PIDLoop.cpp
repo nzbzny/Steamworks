@@ -1,6 +1,8 @@
 #include "PIDLoop.h"
 
-PIDLoop::PIDLoop() {
+PIDLoop::PIDLoop() :
+	filter()
+{
   k_p_Angle = .025;
   k_i_Angle = .001;
   k_d_Angle = .001;
@@ -34,7 +36,6 @@ PIDLoop::PIDLoop() {
   last_x_error = 0;
   xOutput = 0;
   xMaxError = 3; //TODO: may have to play around with this number
-
 }
 
 void PIDLoop::resetPIDAngle() { //reset angle pid values
@@ -187,20 +188,9 @@ float PIDLoop::PIDY(float lDistance, float rDistance) {
   std::ofstream logger; logger.open("/var/loggerFile.txt", std::ofstream::out); //start logger
   logger << "Loop entered\n";
   //TODO: put these checks into the ultrasonic filter function
-  if (lDistance > 0 && lDistance < 100 && rDistance > 0 && rDistance < 100) { //if both distances are within range to go to a gear
-	  //averageDistance = (lDistance + rDistance) / 2;
-	  averageDistance = ultrasonicFilter(lDistance, rDistance);
-	  SmartDashboard::PutString("PIDY Avg. Dist. Loop", "ultrasonicFilter");
-  }
-  else if ((lDistance < 0 || lDistance > 100) && (rDistance > 0 && rDistance < 100)) { //if left sensor is outside of range to move to gear
-	  averageDistance = rDistance;
-	  SmartDashboard::PutString("PIDY Avg. Dist. Loop", "rDistance");
-  } else if ((rDistance < 0 || rDistance > 100) && (lDistance > 0 && lDistance < 100)) { //if right sensor is outside of range to move to gear
-	  averageDistance = lDistance;
-	  SmartDashboard::PutString("PIDY Avg. Dist. Loop", "lDistance");
-  } else {
-	  SmartDashboard::PutString("PIDY Status", "Ultrasonic Error");
-	  return 0;
+  averageDistance = filter.ultrasonicFilter(lDistance, rDistance);
+  if (averageDistance == -1) {
+	  return -1;
   }
   y_error = averageDistance - 12; //error - stop about a foot away
 
