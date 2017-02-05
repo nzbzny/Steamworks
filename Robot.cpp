@@ -35,7 +35,7 @@ Robot::Robot() :
 		robotDrive(Constants::frontLeftDriveChannel, Constants::rearLeftDriveChannel, Constants::frontRightDriveChannel, Constants::rearRightDriveChannel),
 		driveStick(Constants::driveStickChannel),
 		operatorStick(Constants::operatorStickChannel),
-		gyro(I2C::Port::kMXP, 100),
+		gyro(I2C::Port::kMXP, 200),
 		pid(),
 		aimer(),
 		leftProx(1, 0),
