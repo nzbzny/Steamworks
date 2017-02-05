@@ -5,9 +5,11 @@
 
 class Filters {
 
+	//Kalman filter
 	float refreshRate;
 	float lastUltrasonicValue;
 	float predictedValue;
+	float lastUpdatedPredictedValue;
 
 	//ultrasonic filter
 	float lastLeftUltrasonic;
