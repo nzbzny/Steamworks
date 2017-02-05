@@ -7,6 +7,7 @@ Filters::Filters()
 	predictedValue = 0.0;
 	lastLeftUltrasonic = 0.0;
 	lastRightUltrasonic = 0.0;
+	lastUpdatedPredictedValue = 0.0;
 }
 
 void Filters::initializeLastUltrasonics(float left, float right) {
@@ -16,6 +17,7 @@ void Filters::initializeLastUltrasonics(float left, float right) {
 
 void Filters::initializePredictedValue(float left, float right) {
 	predictedValue = (left + right) / 2;
+	lastUpdatedPredictedValue = predictedValue;
 }
 
 float Filters::ultrasonicFilter(float left, float right) {
@@ -45,9 +47,11 @@ float Filters::ultrasonicFilter(float left, float right) {
 
 float Filters::kalmanFilter(float left, float right, float power) {
 	if (fabs(lastUltrasonicValue - ultrasonicFilter(left, right)) > .01) {
-		predictedValue = predictedValue + (ultrasonicFilter(left, right) - lastUltrasonicValue); //ultrasonic filter - lastValue is the difference in the actual which we use to update our predicted
+		predictedValue = predictedValue + (ultrasonicFilter(left, right) - lastUpdatedPredictedValue); //ultrasonic filter - lastValue is the difference in the actual which we use to update our predicted
 		lastUltrasonicValue = ultrasonicFilter(left, right);
+		lastUpdatedPredictedValue = predictedValue; //new predicted value for where we are when the ultrasonic is sending the next value to read from
+	} else {
+		predictedValue += 90 * power * refreshRate; //90 inches * power * time (-power means going forward) TODO: flip sign if necessary
 	}
-	predictedValue += 90 * power * refreshRate; //90 inches * power * time (-power means going forward) TODO: flip sign if necessary
 	return predictedValue;
 }
