@@ -35,7 +35,7 @@ Robot::Robot() :
 		robotDrive(Constants::frontLeftDriveChannel, Constants::rearLeftDriveChannel, Constants::frontRightDriveChannel, Constants::rearRightDriveChannel),
 		driveStick(Constants::driveStickChannel),
 		operatorStick(Constants::operatorStickChannel),
-		gyro(I2C::Port::kMXP, 200),
+		gyro(I2C::Port::kMXP, 100),
 		pid(),
 		aimer(),
 		leftProx(1, 0),
@@ -113,13 +113,77 @@ void Robot::OperatorControl()
 	shooter.enable();
 	compressor.Start();
 
+
+	//  dgTest stuff
+	//
+//	double yTargetDistance = -9999.0;
+//	bool inYTargetMode = false;
+//	double angleTarget = -9999.0;
+//	bool inAngleTargetMode = false;
+//	double xTargetDistance = -9999.0;
+//	bool inXTargetMode = false;
+//	double lastLeftProxValue = 0;
+//	double lastLeftProxTime = 0;
+//	double lastRightProxValue = 0;
+//	double lastrightProxTime = 0;
+//	double lastCameraAngleToGear = 0;
+//	double lastCameraAngleToGearTime = 0;
+//	Timer dgTimer = new Timer();
+//	double lastLoopTimeValue = dgTimer.Get();
+//	std::tuple(double, double, double) positionHistory[50];
+	//
+	//
+
+
 	while (IsOperatorControl() && IsEnabled())
 	{
 
+//		if(driveStick.GetRawButton(5)){
+//
+//			//  DG code to  test the alternative predictive drive method
+//			if(!inYTargetMode){
+//
+//				inYTargetMode = true;
+//				yTargetDistance = 12;
+//
+//			}
+//
+//			if (!inAngleTargetMode){
+//				inAngleTargetMode = true;
+//				angleTarget = 0;
+//
+//			}
+//
+//			//
+//			// get the distance
+//			leftUltrasonic = leftProx.GetRangeInches();
+//			rightUltrasonic = rightProx.GetRangeInches();
+//			SmartDashboard::PutNumber("leftProx", leftUltrasonic);
+//			SmartDashboard::PutNumber("rightProx", rightUltrasonic);
+//			double ultrasonicAverage = (leftUltrasonic + rightUltrasonic )/2;
+//
+//
+//			// get the target angle
+//			float angle = aimer.GetAngleToGear();
+//			//calculate the x offset
+//			double xOffset = ultrasonicAverage * sin(angle*PI/180);
+//			if(!inXTargetMode){
+//				xTargetDistance = xOffset;
+//				inXTargetMode = true;
+//			}
+//
+//
+//
+//		}else{
+//			inXTargetMode = false;
+//			inYTargetMode = false;
+//			inAngleTargetMode = false;
+//		}
+
 
 		if (driveStick.GetRawButton(11)) { //TODO: delete test code
-			int counter = 0;
-			while (counter < 100) {
+			float kalman = filter.kalmanFilter(leftUltrasonic, rightUltrasonic, -.50);
+			while (kalman > 50) {
 				SmartDashboard::PutBoolean("In Kalman Test Loop", true);
 				leftUltrasonic = leftProx.GetRangeInches();
 				rightUltrasonic = rightProx.GetRangeInches();
@@ -127,8 +191,8 @@ void Robot::OperatorControl()
 				SmartDashboard::PutNumber("rightProx", rightUltrasonic);
 				SmartDashboard::PutNumber("Ultrasonic Filter", filter.ultrasonicFilter(leftUltrasonic, rightUltrasonic));
 				robotDrive.MecanumDrive_Cartesian(0.0, -.50, 0.0);
-				counter++;
-				SmartDashboard::PutNumber("Ultrasonic Kalman Filter", filter.kalmanFilter(leftUltrasonic, rightUltrasonic, -.50));
+				kalman = filter.kalmanFilter(leftUltrasonic, rightUltrasonic, -.50);
+				SmartDashboard::PutNumber("Ultrasonic Kalman Filter", kalman);
 				Wait(.01);
 			}
 			SmartDashboard::PutBoolean("In Kalman Test Loop", false);
