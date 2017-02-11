@@ -7,7 +7,7 @@
 
 class ShooterSubsystem {
 
-CANTalon rotator;
+CANTalon rotator; //shooter angle
 CANTalon shooter;
 Talon agitator;
 
@@ -17,6 +17,7 @@ public:
 	void disable();
 	void agitate(float speed);
 	void move(float moveValue);
+	float getAngle();
 	bool setAngle(float angle);
 	void setSpeed(float speed);
 	void shoot(float speed);

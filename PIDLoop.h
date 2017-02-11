@@ -1,5 +1,6 @@
 #include "WPILib.h"
 #include "Constants.h"
+#include "Filters.h"
 #include <math.h>
 #include <fstream>
 
@@ -45,11 +46,13 @@ class PIDLoop {
   float lastLeftUltrasonic = 0;
   float lastRightUltrasonic = 0;
 
+  Filters filter;
+
 public:
 	PIDLoop();
 	void resetPIDAngle();
-  void resetPIDX();
-  void resetPIDY();
+	void resetPIDX();
+	void resetPIDY();
 	void setAngle(float pAngleInput, float iAngleInput, float dAngleInput);
 	void setX(float pXInput, float iXInput, float dXInput);
 	void setY(float pYInput, float iYInput, float dYInput);

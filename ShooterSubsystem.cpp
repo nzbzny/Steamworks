@@ -5,8 +5,8 @@ ShooterSubsystem::ShooterSubsystem(int rotatorChannel, int shooterChannel, int a
   shooter(shooterChannel),
   agitator(agitatorChannel)
 {
-  rotator.SetTalonControlMode(CANTalon::TalonControlMode::kThrottleMode); //enum might be wrong - check in eclipse
-  shooter.SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode); //enum might be wrong - check in eclipse
+  //rotator.SetTalonControlMode(CANTalon::TalonControlMode::kThrottleMode); //enum might be wrong - check in eclipse
+  //shooter.SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode); //enum might be wrong - check in eclipse
 }
 
 void ShooterSubsystem::enable() { //enable cantalons
@@ -27,8 +27,13 @@ void ShooterSubsystem::move(float moveValue) { //rotate the shooter at a speed (
   rotator.Set(moveValue); //move shooter up and down
 }
 
+float ShooterSubsystem::getAngle() {
+	//math
+	return 0; //TODO: actually do the thing
+}
+
 bool ShooterSubsystem::setAngle(float angle) { //return true when completed
-  float currentAngle = 0; //TODO: get current angle - find math
+  float currentAngle = getAngle();
   if (fabs(currentAngle - angle) > 1) { //if it's close enough - TODO: may have to lower acceptable error
     move(.25); //slowly angle - TODO: pid maybe? see how well it works
     return false; //not done yet
@@ -39,7 +44,8 @@ bool ShooterSubsystem::setAngle(float angle) { //return true when completed
 }
 
 void ShooterSubsystem::setSpeed(float speed) { //set speed to shoot the balls at
-  shooter.Set(speed * Constants::shooterMaxSpeed); //TODO: get shooter max speed
+  //shooter.Set(speed * Constants::shooterMaxSpeed); //TODO: get shooter max speed
+	shooter.Set(speed);
 }
 
 void ShooterSubsystem::shoot(float speed) { //shoot the balls at a certain speed

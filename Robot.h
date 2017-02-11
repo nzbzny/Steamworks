@@ -6,6 +6,10 @@
 #include "GearSubsystem.h"
 #include "ShooterSubsystem.h"
 #include "IR.h"
+#include "Filters.h"
+#include "IntakeSubsystem.h"
+#include "ClimberSubsystem.h"
+#include "Brakes.h"
 #include "CANTalon.h"
 #include <math.h>
 #include <thread>
@@ -18,10 +22,10 @@
 
 class Robot : public SampleRobot {
 
-	/*CANTalon frontLeftMotor;
-	CANTalon frontRightMotor;
+	CANTalon frontLeftMotor;
 	CANTalon rearLeftMotor;
-	CANTalon rearRightMotor;*/ //TODO: reinitialize for new drive train
+	CANTalon frontRightMotor;
+	CANTalon rearRightMotor; //TODO: reinitialize for new drive train
 	frc::RobotDrive robotDrive;
 	frc::Joystick driveStick;
 	frc::Joystick operatorStick;
@@ -35,6 +39,11 @@ class Robot : public SampleRobot {
 	GearSubsystem gear;
 	ShooterSubsystem shooter;
 	Compressor compressor;
+	Filters filter;
+	IntakeSubsystem intake;
+	ClimberSubsystem climber;
+	Brakes brakes;
+	PowerDistributionPanel pdp;
 
 public:
 	Robot();
