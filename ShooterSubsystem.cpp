@@ -28,8 +28,7 @@ void ShooterSubsystem::move(float moveValue) { //rotate the shooter at a speed (
 }
 
 float ShooterSubsystem::getAngle() {
-	//math
-	return 0; //TODO: actually do the thing
+  return Roll();
 }
 
 bool ShooterSubsystem::setAngle(float angle) { //return true when completed
@@ -57,4 +56,12 @@ void ShooterSubsystem::stop() { //completely stop the shooter from moving
 	agitate(0.0);
 	setSpeed(0.0);
   move(0.0);
+}
+
+float ShooterSubsystem::Roll() {
+	return -(atan2(accel.GetX(),sqrt(accel.GetY()*accel.GetY()+accel.GetZ()*accel.GetZ()))  * 180.0) / PI;
+}
+
+float ShooterSubsystem::Pitch(){
+	return (atan2(accel.GetY(),sqrt(accel.GetX()*accel.GetX()+accel.GetZ()*accel.GetZ()))  * 180.0) / PI;
 }
