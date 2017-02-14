@@ -3,7 +3,8 @@
 ShooterSubsystem::ShooterSubsystem(int rotatorChannel, int shooterChannel, int agitatorChannel) :
   rotator(rotatorChannel),
   shooter(shooterChannel),
-  agitator(agitatorChannel)
+  agitator(agitatorChannel),
+  accel(I2C::Port::kOnboard)
 {
   //rotator.SetTalonControlMode(CANTalon::TalonControlMode::kThrottleMode); //enum might be wrong - check in eclipse
   //shooter.SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode); //enum might be wrong - check in eclipse
