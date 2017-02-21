@@ -1,7 +1,7 @@
 #include "PIDLoop.h"
 
-PIDLoop::PIDLoop() :
-	filter()
+PIDLoop::PIDLoop() //:
+	//filter()
 {
   k_p_Angle = .025;
   k_i_Angle = .001;
@@ -95,7 +95,7 @@ float PIDLoop::PIDAngle(float angleOffset, float desiredAngle) {
   angleOutput = fabs(angleOutput) < .23 ? std::copysign(.23, angleOutput) : angleOutput; //if angleOutput is below min, set to min
   angleOutput = fabs(angleOutput) > 1.0 ? std::copysign(1.0, angleOutput) : angleOutput; //if angleOutput is above max, set to max
   //angleOutput = angle_error < 0 ? angleOutput : -angleOutput;
-  if (fabs(angle_error) < angleMaxError) { //if done moving
+  if (fabs(angle_error) < Constants::angleErrorLimit) { //if done moving
 	  i_Angle = 0;
 	  angleOutput = 0;
   }
@@ -188,7 +188,8 @@ float PIDLoop::PIDY(float lDistance, float rDistance) {
   std::ofstream logger; logger.open("/var/loggerFile.txt", std::ofstream::out); //start logger
   logger << "Loop entered\n";
   //TODO: put these checks into the ultrasonic filter function
-  averageDistance = filter.ultrasonicFilter(lDistance, rDistance);
+  //averageDistance = filter.ultrasonicFilter(lDistance, rDistance);
+  averageDistance = 12;
   if (averageDistance == -1) {
 	  return -1;
   }

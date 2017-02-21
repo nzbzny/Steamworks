@@ -7,10 +7,8 @@
 #include "ShooterSubsystem.h"
 #include "IR.h"
 #include "Filters.h"
-#include "IntakeSubsystem.h"
-#include "ClimberSubsystem.h"
-#include "Brakes.h"
 #include "CANTalon.h"
+#include "Accumulator.h"
 #include <math.h>
 #include <thread>
 #include <fstream>
@@ -23,8 +21,8 @@
 class Robot : public SampleRobot {
 
 	CANTalon frontLeftMotor;
-	CANTalon rearLeftMotor;
 	CANTalon frontRightMotor;
+	CANTalon rearLeftMotor;
 	CANTalon rearRightMotor; //TODO: reinitialize for new drive train
 	frc::RobotDrive robotDrive;
 	frc::Joystick driveStick;
@@ -40,10 +38,9 @@ class Robot : public SampleRobot {
 	ShooterSubsystem shooter;
 	Compressor compressor;
 	Filters filter;
-	IntakeSubsystem intake;
-	ClimberSubsystem climber;
-	Brakes brakes;
-	PowerDistributionPanel pdp;
+	Encoder* encoder;
+	cs::UsbCamera camera0;
+	cs::UsbCamera camera1;
 
 public:
 	Robot();

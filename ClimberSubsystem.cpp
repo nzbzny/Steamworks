@@ -6,6 +6,6 @@ ClimberSubsystem::ClimberSubsystem(int climberChannel) :
 	climber.SetControlMode(CANTalon::ControlMode::kSpeed); //speed control mode - RPM
 }
 
-void ClimberSubsystem::setSpeed(float speed) {
-	climber.Set(speed * Constants::climberMaxSpeed); //TODO: temp value
+void ClimberSubsystem::climb() {
+	climber.Set(.5 * Constants::climberMaxSpeed); //TODO: temp value
 }

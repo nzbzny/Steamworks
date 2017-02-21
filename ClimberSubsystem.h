@@ -10,7 +10,7 @@ class ClimberSubsystem {
 	CANTalon climber;
 public:
 	ClimberSubsystem(int climberChannel);
-	void setSpeed(float speed);
+	void climb();
 };
 
 #endif

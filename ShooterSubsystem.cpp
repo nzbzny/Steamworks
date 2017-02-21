@@ -3,11 +3,10 @@
 ShooterSubsystem::ShooterSubsystem(int rotatorChannel, int shooterChannel, int agitatorChannel) :
   rotator(rotatorChannel),
   shooter(shooterChannel),
-  agitator(agitatorChannel),
-  accel(I2C::Port::kOnboard)
+  agitator(agitatorChannel)
 {
-  //rotator.SetTalonControlMode(CANTalon::TalonControlMode::kThrottleMode); //enum might be wrong - check in eclipse
-  //shooter.SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode); //enum might be wrong - check in eclipse
+  rotator.SetTalonControlMode(CANTalon::TalonControlMode::kThrottleMode); //enum might be wrong - check in eclipse
+  shooter.SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode); //enum might be wrong - check in eclipse
 }
 
 void ShooterSubsystem::enable() { //enable cantalons
@@ -28,12 +27,8 @@ void ShooterSubsystem::move(float moveValue) { //rotate the shooter at a speed (
   rotator.Set(moveValue); //move shooter up and down
 }
 
-float ShooterSubsystem::getAngle() {
-  return Roll();
-}
-
 bool ShooterSubsystem::setAngle(float angle) { //return true when completed
-  float currentAngle = getAngle();
+  float currentAngle = 0; //TODO: get current angle - find math
   if (fabs(currentAngle - angle) > 1) { //if it's close enough - TODO: may have to lower acceptable error
     move(.25); //slowly angle - TODO: pid maybe? see how well it works
     return false; //not done yet
@@ -44,8 +39,7 @@ bool ShooterSubsystem::setAngle(float angle) { //return true when completed
 }
 
 void ShooterSubsystem::setSpeed(float speed) { //set speed to shoot the balls at
-  //shooter.Set(speed * Constants::shooterMaxSpeed); //TODO: get shooter max speed
-	shooter.Set(speed);
+  shooter.Set(speed * Constants::shooterMaxSpeed); //TODO: get shooter max speed
 }
 
 void ShooterSubsystem::shoot(float speed) { //shoot the balls at a certain speed
@@ -57,12 +51,4 @@ void ShooterSubsystem::stop() { //completely stop the shooter from moving
 	agitate(0.0);
 	setSpeed(0.0);
   move(0.0);
-}
-
-float ShooterSubsystem::Roll() {
-	return -(atan2(accel.GetX(),sqrt(accel.GetY()*accel.GetY()+accel.GetZ()*accel.GetZ()))  * 180.0) / PI;
-}
-
-float ShooterSubsystem::Pitch(){
-	return (atan2(accel.GetY(),sqrt(accel.GetX()*accel.GetX()+accel.GetZ()*accel.GetZ()))  * 180.0) / PI;
 }

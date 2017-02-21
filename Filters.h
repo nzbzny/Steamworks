@@ -4,9 +4,9 @@
 #ifndef SRC_FILTERS_H
 #define SRC_FILTERS_H
 
-struct DoubleDouble
+struct Double
 {
-	DoubleDouble(float xt, float yt, float zt): x(xt), y(yt), angle(zt) {}
+	Double(float xt, float yt, float zt): x(xt), y(yt), angle(zt) {}
 	float x, y, angle;
 };
 
@@ -21,7 +21,7 @@ private:
 	int lastLeftUpdatedElement;
 	int lastRightUpdatedElement;
 
-	std::vector<DoubleDouble> history;
+	std::vector<Double> history;
 
 public:
 	Filters();
@@ -33,3 +33,4 @@ public:
 };
 
 #endif
+

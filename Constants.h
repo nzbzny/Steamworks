@@ -4,25 +4,29 @@
 namespace Constants {
 
   //Pin Definitions
-  static constexpr int frontLeftDriveChannel = 1;
-  static constexpr int rearLeftDriveChannel = 4;
-  static constexpr int frontRightDriveChannel = 2;
-  static constexpr int rearRightDriveChannel = 3;
+//  static constexpr int frontLeftDriveChannel = 2;
+//  static constexpr int rearLeftDriveChannel = 3;
+//  static constexpr int frontRightDriveChannel = 1;
+//  static constexpr int rearRightDriveChannel = 0;
+	static constexpr int frontLeftDriveChannel = 4;
+	static constexpr int rearLeftDriveChannel = 3;
+	static constexpr int frontRightDriveChannel = 1;
+	static constexpr int rearRightDriveChannel = 2;
   static constexpr int driveStickChannel = 0;
   static constexpr int operatorStickChannel = 1;
-  static constexpr int gearActuatorInSole = 4; //TODO: may change
-  static constexpr int gearActuatorOutSole = 5; //TODO: may change
-  static constexpr int rotatorChannel = 5;
-  static constexpr int shooterChannel = 7;
-  static constexpr int agitatorChannel = 0;
-  static constexpr int compressorPin = 3;
+  static constexpr int gearReleaseInSole = 99;
+  static constexpr int gearReleaseOutSole = 99;
+  static constexpr int rotatorChannel = 99;
+  static constexpr int shooterChannel = 99;
+  static constexpr int agitatorChannel = 99;
+  static constexpr int compressorPin = 99;
+
+  static constexpr int driveXAxis = 0;
+  static constexpr int driveYAxis = 1;
+  static constexpr int driveZAxis = 2;
   static constexpr int driveThrottleAxis = 3;
   static constexpr int intakeMotorPin = 99;
-  static constexpr int verticalConveyorMotorPin = 1;
-  static constexpr int climberPin = 6;
-  static constexpr int brakesInSole = 6; //TODO: may change
-  static constexpr int brakesOutSole = 7; //TODO: may change
-  static constexpr int intakePDPChannel = 10;
+  static constexpr int verticalConveyorMotorPin = 99;
 
   //PID
   static constexpr float angle_p_default = .025;
@@ -34,22 +38,19 @@ namespace Constants {
   static constexpr float x_p_default = .013;
   static constexpr float x_i_default = .001;
   static constexpr float x_d_default = .001;
+  static constexpr float angleErrorLimit = 1.0;
 
-  //Joystick
+
+  //Joystick Buttons
+  static constexpr int runGearMoveThreadButton = 99;
+  static constexpr int cancelGearMoveThreadButton = 99;
+  static constexpr int turnToGearButton = 1;
   static constexpr int moveToGearButton = 2;
-  static constexpr int driveOneAxisButton = 7;
-  static constexpr int gearActuateButton = 4;
-  static constexpr int shooterAutoAngleButton = 5;
-  static constexpr int shooterShootButton = 6;
-  static constexpr int cancelAllButton = 3;
-  static constexpr int driveXAxis = 0;
-  static constexpr int driveYAxis = 1;
-  static constexpr int driveZAxis = 2;
-  static constexpr int fieldOrientedDriveButton = 14;
-  static constexpr int swapCamerasButton = 8;
-  static constexpr int intakeActivateButton = 1;
-  static constexpr int climbButton = 13; //TODO: may want to change - ask drivers / kyle
-  static constexpr int brakeButton = 11; //TODO: may want to change - ask drivers / kyle
+  static constexpr int driveOneAxisButton = 3;
+  static constexpr int gearReleaseButton = 99;
+  static constexpr int shooterAutoAngleButton = 99;
+  static constexpr int shooterShootButton = 99;
+  static constexpr int cancelAllButton = 99;
 
   //Joystick scaling constants
   static constexpr float driveXDeadZone = .2;
@@ -64,15 +65,19 @@ namespace Constants {
 
   //Shooter
   static constexpr int shooterMaxSpeed = 512; //TODO: temp
-
+  
   //Climber
   static constexpr int climberMaxSpeed = 512; //TODO: temp
-  static constexpr int climberRunSpeed = 1.0;
 
-  //Intake
-  static constexpr float intakeRunSpeed = .5; //TODO: temp
-  static constexpr float verticalConveyorRunSpeed = .5; //TODO: temp
-  static constexpr float intakeCurrentMax = 100; //TODO: temp
+  static constexpr float teleopLoopTime = 0.011;
+
+  static constexpr float accumulatorPower = -0.008;
+  static constexpr float yDistancePerSecond = 90.0;
+  static constexpr float xDistancePerSecond = 24;
+  static constexpr float rightCameraOffset = 7.5;
+  static constexpr float leftCameraOffset = -7.5;
+  static constexpr float minStrafePower = .3;
+  static constexpr float minForwardPower = .15;
 
 };
 #endif
