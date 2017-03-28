@@ -6,11 +6,13 @@
 #ifndef SRC_SHOOTERSUBSYSTEM_H
 #define SRC_SHOOTERSUBSYSTEM_H
 
+#define PI 3.14159265
+
 class ShooterSubsystem {
 
 CANTalon rotator; //shooter angle
 CANTalon shooter;
-Talon agitator;
+Talon noah; //agitator - noah (me) is the biggest agitator on the team
 ADXL345_I2C accel;
 
 public:
@@ -24,6 +26,7 @@ public:
 	void setSpeed(float speed);
 	void shoot(float speed);
 	void stop();
+	float getEncoder();
 	float Roll();
 	float Pitch();
 };

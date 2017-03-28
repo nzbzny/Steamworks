@@ -1,6 +1,6 @@
 #include "WPILib.h"
 #include "Constants.h"
-#include "Filters.h"
+//#include "Filters.h"
 #include <math.h>
 #include <fstream>
 
@@ -46,7 +46,7 @@ class PIDLoop {
   float lastLeftUltrasonic = 0;
   float lastRightUltrasonic = 0;
 
-  Filters filter;
+//  Filters filter;
 
 public:
 	PIDLoop();

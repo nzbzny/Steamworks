@@ -1,9 +1,9 @@
 #include "PIDLoop.h"
 
-PIDLoop::PIDLoop() :
-	filter()
+PIDLoop::PIDLoop() //:
+	//filter()
 {
-  k_p_Angle = .025;
+  k_p_Angle = .01;
   k_i_Angle = .001;
   k_d_Angle = .001;
   p_Angle = 0;
@@ -12,7 +12,7 @@ PIDLoop::PIDLoop() :
   angle_error = 0;
   angleOutput = 0;
   last_angle_error = 0;
-  angleMaxError = 3;
+  angleMaxError = 2;
   iteration_time = .005;
 
   k_p_Y = .025;
@@ -92,22 +92,22 @@ float PIDLoop::PIDAngle(float angleOffset, float desiredAngle) {
 
 
 
-  angleOutput = fabs(angleOutput) < .23 ? std::copysign(.23, angleOutput) : angleOutput; //if angleOutput is below min, set to min
-  angleOutput = fabs(angleOutput) > 1.0 ? std::copysign(1.0, angleOutput) : angleOutput; //if angleOutput is above max, set to max
+  angleOutput = fabs(angleOutput) < .1 ? std::copysign(.1, angleOutput) : angleOutput; //if angleOutput is below min, set to min
+  angleOutput = fabs(angleOutput) > .9 ? std::copysign(.9, angleOutput) : angleOutput; //if angleOutput is above max, set to max
   //angleOutput = angle_error < 0 ? angleOutput : -angleOutput;
-  if (fabs(angle_error) < angleMaxError) { //if done moving
+  if (fabs(angle_error) < Constants::angleErrorLimit) { //if done moving
 	  i_Angle = 0;
 	  angleOutput = 0;
   }
-  angleOutput = -angleOutput;
+  angleOutput = -angleOutput; //TODO: may need to add back in
   logger << p_Angle << " " << angle_error << " " << angleOutput << "\n"; //output to log file
   //frc::Wait(iteration_time);
   logger.close();
 
-  SmartDashboard::PutNumber("Accumulated i", i_Angle);
+  /*SmartDashboard::PutNumber("Accumulated i", i_Angle);
   SmartDashboard::PutNumber("Desired Angle", desiredAngle);
   SmartDashboard::PutNumber("angleOffset", angleOffset);
-  SmartDashboard::PutNumber("angle_error", angle_error);
+  SmartDashboard::PutNumber("angle_error", angle_error);*/
 
   return angleOutput;
 }
@@ -177,7 +177,7 @@ float PIDLoop::PIDX(float angleToGear) {
 
   logger.close(); //close logger
 
-  SmartDashboard::PutNumber("x_error", x_error);
+  //SmartDashboard::PutNumber("x_error", x_error);
 
   return xOutput;
 }
@@ -188,7 +188,8 @@ float PIDLoop::PIDY(float lDistance, float rDistance) {
   std::ofstream logger; logger.open("/var/loggerFile.txt", std::ofstream::out); //start logger
   logger << "Loop entered\n";
   //TODO: put these checks into the ultrasonic filter function
-  averageDistance = filter.ultrasonicFilter(lDistance, rDistance);
+  //averageDistance = filter.ultrasonicFilter(lDistance, rDistance);
+  averageDistance = 12; //TODO: why is this 12? @Joe
   if (averageDistance == -1) {
 	  return -1;
   }
@@ -211,9 +212,9 @@ float PIDLoop::PIDY(float lDistance, float rDistance) {
   //frc::Wait(iteration_time);
 
   logger.close(); //close logger
-  SmartDashboard::PutNumber("y_error", y_error);
+  /*SmartDashboard::PutNumber("y_error", y_error);
   SmartDashboard::PutNumber("avgDist", averageDistance);
-  SmartDashboard::PutNumber("i_Y", i_Y);
+  SmartDashboard::PutNumber("i_Y", i_Y);*/
 
   return -yOutput;
 }

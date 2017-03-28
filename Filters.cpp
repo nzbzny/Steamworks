@@ -7,6 +7,8 @@ history()
 	lastLeftUltrasonic = 0.0;
 	lastRightUltrasonic = 0.0;
 	predictedValue = 0.0;
+	lastLeftUpdatedElement = 0.0;
+	lastRightUpdatedElement = 0.0;
 }
 
 void Filters::update(float x, float y, float angle)

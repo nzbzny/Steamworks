@@ -2,6 +2,7 @@
 #include "math.h"
 #include <vector>
 #include <memory>
+#include "Constants.h"
 
 #ifndef SRC_AIMER_H
 #define SRC_AIMER_H
@@ -24,9 +25,14 @@ public:
 	float GetDistanceToGear();
 	float GetOffset();
 	int GetAge();
+	int GetBoilerAge();
 	float TwoCameraAngleFilter();
-	float GetXDistanceToGear();
-	float GetAngleToGear();
+	float GetXDistanceToGear(float distance, float currentAngleError);
+	float GetAngleToGear(float distance);
+	float GetBoilerAngle();
+	float GetBoilerDistance();
+	float ConvertToZeroTo360(float rawAngle);
+	float ConvertToPlusMinus180(float rawAngle);
 };
 
 #endif

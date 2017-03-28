@@ -11,6 +11,7 @@
 #include "ClimberSubsystem.h"
 #include "Brakes.h"
 #include "CANTalon.h"
+#include "Accumulator.h"
 #include <math.h>
 #include <thread>
 #include <fstream>
@@ -44,6 +45,12 @@ class Robot : public SampleRobot {
 	ClimberSubsystem climber;
 	Brakes brakes;
 	PowerDistributionPanel pdp;
+	Encoder* encoder;
+	Encoder yEncoder;
+	Encoder xEncoder;
+	cs::UsbCamera camera0;
+	cs::UsbCamera camera1;
+	I2C arduino;
 
 public:
 	Robot();
